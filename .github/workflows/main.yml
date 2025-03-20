@@ -15,7 +15,7 @@ jobs:
           python login.py
 
       - name: extracting 
-        run: 7z x LDP.7z.001 -o./bin -y
+        run: 7z x LDP.7z.001 -o"./bin" -y
       - name: install 
         run: |
           cd bin
