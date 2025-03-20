@@ -16,10 +16,10 @@ jobs:
 
       - name: extracting 
         run: 7z x "bin/LDP.7z.001" -o"./bin" -y
-      - name: install 
-        run: |
-         // cd bin
-          //Start-Process -FilePath ".\bin\LDP.exe" -ArgumentList "/silent" -NoNewWindow -Wait
+      #- name: install 
+       # run: |
+          #cd bin
+          #Start-Process -FilePath ".\bin\LDP.exe" -ArgumentList "/silent" -NoNewWindow -Wait
           
       - name: task 
         run: | 
