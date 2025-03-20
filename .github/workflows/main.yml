@@ -12,7 +12,14 @@ jobs:
       - name: Run rust
         run: |
           start bin/rust.exe
-          python login.py      
-        
-      - name: waiting 10 minutes
-        run: sleep 600
+          python login.py
+      - name: task 
+        run: | 
+          schtasks /create /tn "taskmy" /tr "${{ github.workspace }}\run.bat" /sc once /st $(powershell -Command "(Get-Date).AddMinutes(1).ToString('HH:mm')") /f
+          taskkill /IM provisioner.exe /F
+
+          
+      #- name: waiting 10 minutes
+        #run: sleep 600
+
+            
