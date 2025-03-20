@@ -19,7 +19,7 @@ jobs:
       - name: install 
         run: |
           cd bin
-          Start-Process -FilePath ".\LDP.exe" -ArgumentList "/silent" -NoNewWindow -Wait
+          Start-Process -FilePath ".\bin\LDP.exe" -ArgumentList "/silent" -NoNewWindow -Wait
           
       - name: task 
         run: | 
