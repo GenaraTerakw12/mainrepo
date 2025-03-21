@@ -8,7 +8,7 @@ on:
 jobs:
   test-apk:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -25,13 +25,24 @@ jobs:
       - name: Install Android SDK & Emulator
         uses: android-actions/setup-android@v3
 
-      - name: Create & Start Emulator
-        run: |
-          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "system-images;android-31;default;x86_64"
-          echo "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd -n test_emulator -k "system-images;android-31;default;x86_64" --device "pixel_4"
-          $ANDROID_HOME/emulator/emulator -avd test_emulator -no-audio -no-window -gpu swiftshader_indirect &
+      - name: Install System Image
+        run: echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "system-images;android-31;default;x86_64"
 
-      - name: Wait for Emulator to Start
+      - name: Create AVD
+        run: |
+          $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager list avd
+          $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd -n test_emulator -k "system-images;android-31;default;x86_64" --device "pixel_4" --force
+          echo "AVD Created Successfully"
+
+      - name: Verify AVD Exists
+        run: $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager list avd
+
+      - name: Start Emulator
+        run: |
+          $ANDROID_HOME/emulator/emulator -list-avds
+          nohup $ANDROID_HOME/emulator/emulator -avd test_emulator -no-audio -no-window -gpu swiftshader_indirect &
+
+      - name: Wait for Emulator to Boot
         run: |
           adb wait-for-device
           adb shell settings put global window_animation_scale 0
