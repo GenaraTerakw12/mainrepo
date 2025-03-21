@@ -16,6 +16,9 @@ jobs:
       - name: Extract Game Files
         run: 7z x apk/Shadow_Ops.7z.001 -oapk/
 
+      - name: Debug SDK Path
+        run: echo $ANDROID_HOME && ls -R $ANDROID_HOME
+        
       - name: Set Up Android SDK
         run: |
           sudo apt-get update
