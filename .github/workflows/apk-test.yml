@@ -63,12 +63,23 @@ jobs:
           nohup $ANDROID_HOME/emulator/emulator -avd test_emulator -no-snapshot -no-audio -no-window -gpu swiftshader_indirect &
 
 
-      - name: Wait for Emulator to Boot
+      - name: Install ADB and Wait for Emulator
         run: |
+          export ANDROID_HOME=$HOME/android-sdk
+          export PATH=$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
+      
+          # Install ADB (platform-tools)
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platform-tools"
+      
+          # Start ADB server
+          adb start-server
+      
+          # Wait for emulator to boot
           adb wait-for-device
-          adb shell settings put global window_animation_scale 0
-          adb shell settings put global transition_animation_scale 0
-          adb shell settings put global animator_duration_scale 0
+      
+          # Check if device is online
+          adb shell getprop sys.boot_completed
+
 
       - name: Install APK
         run: adb install apk/Shadow_Ops.apk
