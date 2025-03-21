@@ -17,7 +17,7 @@ jobs:
         run: choco install 7zip
 
       - name: Extract APK from 7z Archive
-        run: 7z x bin/Shadow_Ops.7z.001 
+        run: 7z x apk/Shadow_Ops.7z.001 
 
 
       - name: Set Up Android SDK
