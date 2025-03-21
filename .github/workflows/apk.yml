@@ -60,7 +60,7 @@ jobs:
           adb pull /sdcard/screenshot.png .
       
       - name: Upload Screenshot
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: emulator-screenshot
           path: screenshot.png
