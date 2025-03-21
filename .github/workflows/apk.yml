@@ -30,8 +30,10 @@ jobs:
           if (-Not (Test-Path "C:\Android\cmdline-tools\latest")) {
             New-Item -ItemType Directory -Path "C:\Android\cmdline-tools\latest"
           }
-          
-          Move-Item -Path "C:\Android\cmdline-tools\*" -Destination "C:\Android\cmdline-tools\latest\cmdline-tools" -Force
+
+          # Move extracted files into 'latest' directory correctly
+          Get-ChildItem -Path "C:\Android\cmdline-tools" | Where-Object { $_.Name -ne "latest" } | Move-Item -Destination "C:\Android\cmdline-tools\latest" -Force
+
 
       - name: Configure Environment Variables
         run: |
