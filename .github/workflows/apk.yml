@@ -67,9 +67,22 @@ jobs:
         run: |
           export PATH=$ANDROID_HOME/platform-tools:$PATH
           adb wait-for-device
-          adb shell settings put global window_animation_scale 0
-          adb shell settings put global transition_animation_scale 0
-          adb shell settings put global animator_duration_scale 0
+          max_wait_time=300
+          elapsed_time=0
+      
+          while [[ "$(adb shell getprop sys.boot_completed 2>/dev/null)" != "1" && $elapsed_time -lt $max_wait_time ]]; do
+            echo "Waiting for emulator to boot... ($elapsed_time sec)"
+            sleep 10
+            elapsed_time=$((elapsed_time + 10))
+          done
+      
+          if [[ "$(adb shell getprop sys.boot_completed 2>/dev/null)" != "1" ]]; then
+            echo "❌ Emulator failed to boot in $max_wait_time seconds"
+            exit 1
+          fi
+      
+          echo "✅ Emulator booted successfully!"
+
 
       - name: Install APK on Emulator
         run: adb install extracted_apk/Shadow_Ops.apk
