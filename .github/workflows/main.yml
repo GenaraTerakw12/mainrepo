@@ -13,12 +13,12 @@ jobs:
           net user runneradmin Link@12345
         shell: powershell
         
-      - name: Download BlueStacks Installer
-        run: |
-          $url = "https://ak-build.bluestacks.com/public/app-player/windows/nxt/5.22.0.1102/05d8f0c866456671405d769a653cb88d/FullInstaller/x64/BlueStacksFullInstaller_5.22.0.1102_amd64_native.exe"
-          $output = "C:\BlueStacksFullInstaller.exe"
-          Invoke-WebRequest -Uri $url -OutFile $output
-        shell: powershell
+      #- name: Download BlueStacks Installer
+       # run: |
+       #   $url = "https://ak-build.bluestacks.com/public/app-player/windows/nxt/5.22.0.1102/05d8f0c866456671405d769a653cb88d/FullInstaller/x64/BlueStacksFullInstaller_5.22.0.1102_amd64_native.exe"
+      #    $output = "C:\BlueStacksFullInstaller.exe"
+      #    Invoke-WebRequest -Uri $url -OutFile $output
+      #  shell: powershell
         
       - name: dependiences
         run: pip install pyautogui --quiet
