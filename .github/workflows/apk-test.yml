@@ -40,26 +40,26 @@ jobs:
 
 
 
-      - name: Create and Start Emulator
+      - name: Create and Start ARM Emulator
         run: |
           export ANDROID_HOME=$HOME/android-sdk
           export ANDROID_AVD_HOME=$HOME/.android/avd
           export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH
       
-          # Confirm avdmanager exists
-          ls -l $ANDROID_HOME/cmdline-tools/latest/bin/
-      
           # Create AVD directory if missing
           mkdir -p $ANDROID_AVD_HOME
       
-          # Create Emulator (Fix Home Directory Issue)
+          # Install ARM System Image instead of x86_64
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "system-images;android-30;default;arm64-v8a"
+      
+          # Create ARM Emulator (No KVM Needed)
           echo "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd -n test_emulator \
-            -k "system-images;android-30;default;x86_64" --device "pixel" --force
+            -k "system-images;android-30;default;arm64-v8a" --device "pixel" --force
       
           # List available AVDs to confirm creation
           $ANDROID_HOME/emulator/emulator -list-avds
       
-          # Start Emulator
+          # Start Emulator in Background (No KVM Required)
           nohup $ANDROID_HOME/emulator/emulator -avd test_emulator -no-snapshot -no-audio -no-window -gpu swiftshader_indirect &
 
 
