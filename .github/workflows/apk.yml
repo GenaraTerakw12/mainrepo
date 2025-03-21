@@ -52,7 +52,10 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '11'
-          
+      
+      - name: Accept Android SDK Licenses
+        run: yes | sdkmanager --licenses || true
+
       - name: Install Android SDK & Emulator
         run: |
           sdkmanager --sdk_root=C:\Android --install "platform-tools" "platforms;android-30" "system-images;android-30;default;x86_64" "emulator"
