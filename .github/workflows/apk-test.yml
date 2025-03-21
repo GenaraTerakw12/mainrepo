@@ -63,22 +63,26 @@ jobs:
           nohup $ANDROID_HOME/emulator/emulator -avd test_emulator -no-snapshot -no-audio -no-window -gpu swiftshader_indirect &
 
 
-      - name: Install ADB and Wait for Emulator
+      - name: Wait for Emulator to Boot
         run: |
           export ANDROID_HOME=$HOME/android-sdk
           export PATH=$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
       
-          # Install ADB (platform-tools)
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platform-tools"
-      
           # Start ADB server
           adb start-server
       
-          # Wait for emulator to boot
-          adb wait-for-device
+          # Wait for device to be detected
+          timeout 600 adb wait-for-device
       
-          # Check if device is online
-          adb shell getprop sys.boot_completed
+          # Wait for system to be fully booted
+          boot_complete=""
+          while [[ -z "$boot_complete" || "$boot_complete" != "1" ]]; do
+            echo "Waiting for emulator to boot..."
+            sleep 10
+            boot_complete=$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
+          done
+      
+          echo "Emulator is fully booted!"
 
 
       - name: Install APK
