@@ -1,75 +1,58 @@
-name: Android Emulator Setup
+name: Run APK Game in Emulator
 
 on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  run-android-emulator:
-    runs-on: windows-latest
+  run-apk:
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      # Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: Install 7-Zip
-        run: choco install 7zip
-
-      - name: Extract APK from 7z Archive
-        run: 7z x ./apk/Shadow_Ops.7z.001
-
-
-      - name: Set Up Android SDK
-        run: |
-          Invoke-WebRequest -Uri "https://dl.google.com/android/repository/commandlinetools-win-9477386_latest.zip" -OutFile "cmdline-tools.zip"
-          Expand-Archive cmdline-tools.zip -DestinationPath "C:\Android"
-
-          # Ensure correct folder structure
-          if (-Not (Test-Path "C:\Android\cmdline-tools\latest")) {
-            New-Item -ItemType Directory -Path "C:\Android\cmdline-tools\latest"
-          }
-
-          # Move extracted files into 'latest' directory correctly
-          Get-ChildItem -Path "C:\Android\cmdline-tools" | Where-Object { $_.Name -ne "latest" } | Move-Item -Destination "C:\Android\cmdline-tools\latest" -Force
-
-
-      - name: Configure Environment Variables
-        run: |
-          echo "ANDROID_HOME=C:\Android" | Out-File -FilePath $env:GITHUB_ENV -Append
-          echo "ANDROID_SDK_ROOT=C:\Android" | Out-File -FilePath $env:GITHUB_ENV -Append
-          echo "ANDROID_EMULATOR_USE_SYSTEM_LIBS=1" | Out-File -FilePath $env:GITHUB_ENV -Append
-          echo "C:\Android\cmdline-tools\latest\cmdline-tools\bin" | Out-File -FilePath $env:GITHUB_PATH -Append
-          echo "C:\Android\platform-tools" | Out-File -FilePath $env:GITHUB_PATH -Append
-          echo "C:\Android\emulator" | Out-File -FilePath $env:GITHUB_PATH -Append
-
-      - name: Install Java 11
+      # Set up JDK (required for Android tools)
+      - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'
           java-version: '11'
+          distribution: 'temurin'
 
-      - name: Accept Android SDK Licenses
-        run: |
-          yes | C:\Android\cmdline-tools\latest\bin\sdkmanager.bat --licenses
+      # Set up Android SDK
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v2
 
-      - name: Install Android SDK & Emulator
-        run: |
-          C:\Android\cmdline-tools\latest\bin\sdkmanager.bat --install "platform-tools" "platforms;android-30" "system-images;android-30;default;x86_64" "emulator"
-     
-      
-      - name: Start Emulator
-        run: |
-          emulator -avd test_emulator -no-window -no-audio -no-boot-anim &
+      # Install 7zip to extract the APK
+      - name: Install 7zip
+        run: sudo apt-get install p7zip-full -y
 
-      - name: Wait for Emulator to Boot
+      # Extract the APK from the 7z archive
+      - name: Extract APK
         run: |
-          adb wait-for-device
-          adb shell getprop sys.boot_completed | findstr "1" || timeout /t 10
+          7z x apk/Shadow_Ops.7z.001 -oapk/extracted
+          ls apk/extracted # List extracted files for debugging
 
-      - name: Install APK on Emulator
-        run: |
-          adb install extracted_apk/Shadow_Ops.apk
+      # Start Android emulator
+      - name: Run Android emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30 # Android API level (e.g., 30 for Android 11)
+          arch: x86_64 # Emulator architecture
+          profile: Nexus 6 # Device profile
+          script: |
+            adb devices # List connected devices
+            adb install apk/extracted/Shadow_Ops.apk # Install the APK
+            adb shell am start -n com.example.game/.MainActivity # Launch the game
 
-      - name: Verify APK Installation
-        run: adb shell pm list packages | findstr "shadow_ops"
+      # Upload extracted APK (optional)
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: game-apk
+          path: apk/extracted/Shadow_Ops.apk
