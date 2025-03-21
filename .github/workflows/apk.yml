@@ -22,7 +22,32 @@ jobs:
       - name: Verify APK Extraction
         run: ls -lah extracted_apk
 
-      - name: Run Prebuilt Emulator and Test APK
+      - name: Install Android SDK & Emulator
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget unzip
+          wget https://dl.google.com/android/repository/commandlinetools-linux-10406996_latest.zip -O android_cmdline.zip
+          mkdir -p $HOME/android-sdk/cmdline-tools
+          unzip android_cmdline.zip -d $HOME/android-sdk/cmdline-tools
+          mv $HOME/android-sdk/cmdline-tools/cmdline-tools $HOME/android-sdk/cmdline-tools/latest
+          export ANDROID_HOME=$HOME/android-sdk
+          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH
+          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
+          echo "PATH=$PATH" >> $GITHUB_ENV
+
+      - name: Install Required Android Components
+        run: |
+          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
+          rm -rf $ANDROID_HOME/.android/cache
+          sdkmanager --update
+          yes | sdkmanager --licenses
+          sdkmanager --install "platform-tools" "platforms;android-31" "emulator"
+          sdkmanager --install "system-images;android-31;google_apis;x86" --channel=3 || \
+          (wget https://dl.google.com/android/repository/sys-img/google_apis/x86-31_r05.zip -O android_sysimg.zip && \
+          mkdir -p $ANDROID_HOME/system-images/android-31/google_apis/x86 && \
+          unzip android_sysimg.zip -d $ANDROID_HOME/system-images/android-31/google_apis/x86)
+
+      - name: Use Prebuilt Emulator and Test APK
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 31
