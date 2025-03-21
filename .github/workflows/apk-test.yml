@@ -35,27 +35,27 @@ jobs:
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
           $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-30" "emulator" "system-images;android-30;default;x86_64"
 
-      - name: Create and Start x86_64 Emulator
-        run: |
-          export ANDROID_HOME=$HOME/android-sdk
-          export ANDROID_AVD_HOME=$HOME/.android/avd
-          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH
-      
-          # Create AVD directory if missing
-          mkdir -p $ANDROID_AVD_HOME
-      
-          # Install x86_64 System Image
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "system-images;android-30;default;x86_64"
-      
-          # Create x86_64 Emulator
-          echo "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd -n test_emulator \
-            -k "system-images;android-30;default;x86_64" --device "pixel" --force
-      
-          # List available AVDs to confirm creation
-          $ANDROID_HOME/emulator/emulator -list-avds
-      
-          # Start Emulator in Background
-          nohup $ANDROID_HOME/emulator/emulator -avd test_emulator -no-snapshot -no-audio -no-window -gpu swiftshader_indirect -memory 4096 &
+            - name: Create and Start Emulator
+              run: |
+                export ANDROID_HOME=$HOME/android-sdk
+                export ANDROID_AVD_HOME=$HOME/.android/avd
+                export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH
+            
+                # Create AVD directory if missing
+                mkdir -p $ANDROID_AVD_HOME
+            
+                # Install x86_64 System Image (avoid ARM due to incompatibility)
+                yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "system-images;android-30;default;x86_64"
+            
+                # Create Emulator (x86_64 version, as ARM is not supported)
+                echo "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd -n test_emulator \
+                  -k "system-images;android-30;default;x86_64" --device "pixel" --force
+            
+                # List available AVDs to confirm creation
+                $ANDROID_HOME/emulator/emulator -list-avds
+            
+                # Start Emulator with software rendering mode (disable KVM)
+                nohup $ANDROID_HOME/emulator/emulator -avd test_emulator -no-snapshot -no-audio -no-window -gpu swiftshader_indirect -accel off &
 
       - name: Wait for Emulator to Boot
         run: |
