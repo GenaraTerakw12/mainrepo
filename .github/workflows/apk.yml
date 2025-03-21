@@ -27,7 +27,13 @@ jobs:
           Expand-Archive cmdline-tools.zip -DestinationPath "C:\Android"
 
           # Ensure correct folder structure
-          Move-Item -Path "C:\Android\cmdline-tools" -Destination "C:\Android\cmdline-tools\latest" -Force
+          if (-Not (Test-Path "C:\Android\cmdline-tools\latest")) {
+            New-Item -ItemType Directory -Path "C:\Android\cmdline-tools\latest"
+          }
+
+          # Move extracted files into the latest folder
+          Get-ChildItem -Path "C:\Android\cmdline-tools" -Exclude "latest" | Move-Item -Destination "C:\Android\cmdline-tools\latest" -Force
+
 
       - name: Configure Environment Variables
         run: |
