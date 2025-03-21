@@ -16,9 +16,6 @@ jobs:
       - name: Extract Game Files
         run: 7z x apk/Shadow_Ops.7z.001 -oapk/
 
-      #- name: Debug SDK Path
-       # run: echo $ANDROID_HOME && ls -R $ANDROID_HOME
-        
       - name: Set Up Android SDK
         run: |
           sudo apt-get update
@@ -38,9 +35,7 @@ jobs:
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
           $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-30" "emulator" "system-images;android-30;default;x86_64"
 
-
-
-      - name: Create and Start ARM Emulator
+      - name: Create and Start x86_64 Emulator
         run: |
           export ANDROID_HOME=$HOME/android-sdk
           export ANDROID_AVD_HOME=$HOME/.android/avd
@@ -49,19 +44,18 @@ jobs:
           # Create AVD directory if missing
           mkdir -p $ANDROID_AVD_HOME
       
-          # Install ARM System Image instead of x86_64
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "system-images;android-30;default;arm64-v8a"
+          # Install x86_64 System Image
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "system-images;android-30;default;x86_64"
       
-          # Create ARM Emulator (No KVM Needed)
+          # Create x86_64 Emulator
           echo "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd -n test_emulator \
-            -k "system-images;android-30;default;arm64-v8a" --device "pixel" --force
+            -k "system-images;android-30;default;x86_64" --device "pixel" --force
       
           # List available AVDs to confirm creation
           $ANDROID_HOME/emulator/emulator -list-avds
       
-          # Start Emulator in Background (No KVM Required)
-          nohup $ANDROID_HOME/emulator/emulator -avd test_emulator -no-snapshot -no-audio -no-window -gpu swiftshader_indirect &
-
+          # Start Emulator in Background
+          nohup $ANDROID_HOME/emulator/emulator -avd test_emulator -no-snapshot -no-audio -no-window -gpu swiftshader_indirect -memory 4096 &
 
       - name: Wait for Emulator to Boot
         run: |
@@ -83,7 +77,6 @@ jobs:
           done
       
           echo "Emulator is fully booted!"
-
 
       - name: Install APK
         run: adb install apk/Shadow_Ops.apk
