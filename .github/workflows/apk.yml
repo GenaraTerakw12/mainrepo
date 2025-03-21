@@ -24,9 +24,12 @@ jobs:
         run: |
           echo "Downloading Android Command Line Tools..."
           Invoke-WebRequest -Uri "https://dl.google.com/android/repository/commandlinetools-win-9477386_latest.zip" -OutFile "cmdline-tools.zip"
-          Expand-Archive cmdline-tools.zip -DestinationPath "C:\Android"
+          Expand-Archive cmdline-tools.zip -DestinationPath "C:\Android\cmdline-tools"
+
+          # Ensure correct folder structure for Android SDK tools
           mkdir "C:\Android\cmdline-tools\latest"
-          Move-Item -Path "C:\Android\cmdline-tools\cmdline-tools" -Destination "C:\Android\cmdline-tools\latest"
+          Move-Item -Path "C:\Android\cmdline-tools\cmdline-tools-win" -Destination "C:\Android\cmdline-tools\latest" -Force
+
 
       - name: Configure Environment Variables
         run: |
