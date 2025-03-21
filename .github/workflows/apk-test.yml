@@ -43,15 +43,23 @@ jobs:
       - name: Create and Start Emulator
         run: |
           export ANDROID_HOME=$HOME/android-sdk
+          export ANDROID_AVD_HOME=$HOME/.android/avd
           export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH
       
-          # Debugging: Check if avdmanager exists
+          # Confirm avdmanager exists
           ls -l $ANDROID_HOME/cmdline-tools/latest/bin/
       
-          # Create Emulator (Ensure avdmanager works)
-          yes "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd -n test_emulator -k "system-images;android-30;default;x86_64" --device "pixel"
+          # Create AVD directory if missing
+          mkdir -p $ANDROID_AVD_HOME
       
-          # Start Emulator in Background
+          # Create Emulator (Fix Home Directory Issue)
+          echo "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd -n test_emulator \
+            -k "system-images;android-30;default;x86_64" --device "pixel" --force
+      
+          # List available AVDs to confirm creation
+          $ANDROID_HOME/emulator/emulator -list-avds
+      
+          # Start Emulator
           nohup $ANDROID_HOME/emulator/emulator -avd test_emulator -no-snapshot -no-audio -no-window -gpu swiftshader_indirect &
 
 
