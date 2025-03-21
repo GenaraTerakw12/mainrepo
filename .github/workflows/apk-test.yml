@@ -1,4 +1,4 @@
-name: Unity Game Test
+name: Android Game Test
 
 on: [push, pull_request]
 
@@ -7,36 +7,52 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-    - name: Install dependencies
-      run: sudo apt-get install -y p7zip-full xvfb xdotool ffmpeg
+      - name: Install 7zip
+        run: sudo apt-get install p7zip-full
 
-    - name: Extract the game archive
-      run: 7z x apk/Shadow_Ops.7z.001 -oapk/game
+      - name: Extract Game Files
+        run: 7z x apk/Shadow_Ops.7z.001 -oapk/
 
-    - name: Start virtual display
-      run: |
-        Xvfb :99 -screen 0 1280x720x24 &
-        echo "DISPLAY=:99" >> $GITHUB_ENV
+      - name: Set Up Android SDK
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget unzip
+          wget https://dl.google.com/android/repository/commandlinetools-linux-10406996_latest.zip
+          unzip commandlinetools-linux-*.zip -d $HOME/android-sdk
+          export ANDROID_HOME=$HOME/android-sdk
+          export PATH=$ANDROID_HOME/cmdline-tools/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH
+          yes | sdkmanager --licenses
+          sdkmanager "platform-tools" "platforms;android-30" "emulator" "system-images;android-30;default;x86_64"
 
-    - name: Run game with virtual display
-      run: |
-        chmod +x apk/game/Shadow_Ops.x86_64
-        DISPLAY=:99 xvfb-run --auto-servernum apk/game/Shadow_Ops.x86_64 &
-        sleep 5  # Wait for the game to load
+      - name: Create and Start Emulator
+        run: |
+          echo "no" | avdmanager create avd -n test_emulator -k "system-images;android-30;default;x86_64" --device "pixel"
+          nohup emulator -avd test_emulator -no-snapshot -no-audio -no-window -gpu swiftshader_indirect &
 
-    - name: Simulate Input
-      run: |
-        DISPLAY=:99 xdotool key space
+      - name: Wait for Emulator to Boot
+        run: |
+          adb wait-for-device
+          adb shell settings put global window_animation_scale 0
+          adb shell settings put global transition_animation_scale 0
+          adb shell settings put global animator_duration_scale 0
 
-    - name: Start screen recording
-      run: |
-        ffmpeg -y -f x11grab -video_size 1280x720 -i :99 -t 30 -r 30 -pix_fmt yuv420p game_play.mp4 &
+      - name: Install APK
+        run: adb install apk/Shadow_Ops.apk
 
-    - name: Upload video
-      uses: actions/upload-artifact@v4
-      with:
-        name: game-play-video
-        path: game_play.mp4
+      - name: Launch Game
+        run: adb shell monkey -p com.yourcompany.shadowops -c android.intent.category.LAUNCHER 1
+
+      - name: Interact with Game (Simulate Tap)
+        run: adb shell input tap 500 1000
+
+      - name: Capture Logcat
+        run: adb logcat -d > logcat.txt
+
+      - name: Upload Logs
+        uses: actions/upload-artifact@v3
+        with:
+          name: logcat
+          path: logcat.txt
