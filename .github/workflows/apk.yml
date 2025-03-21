@@ -1,4 +1,4 @@
-name: Android APK Test
+name: Android Emulator Test
 
 on:
   push:
@@ -6,63 +6,39 @@ on:
       - main
 
 jobs:
-  test-apk:
-    runs-on: ubuntu-latest
+  run-android-emulator:
+    runs-on: windows-latest
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Install 7-Zip
-        run: sudo apt-get install p7zip-full -y
+        run: choco install 7zip
 
-      - name: Extract APK
-        run: 7z x Shadow_Ops.7z.001 -oextracted_apk
-
-      - name: Verify APK Extraction
-        run: ls -lah extracted_apk
+      - name: Extract APK from 7z Archive
+        run: |
+          7z x Shadow_Ops.7z.001 -oextracted_apk
 
       - name: Install Android SDK & Emulator
         run: |
-          sudo apt-get update
-          sudo apt-get install -y wget unzip
-          wget https://dl.google.com/android/repository/commandlinetools-linux-10406996_latest.zip -O android_cmdline.zip
-          mkdir -p $HOME/android-sdk/cmdline-tools
-          unzip android_cmdline.zip -d $HOME/android-sdk/cmdline-tools
-          mv $HOME/android-sdk/cmdline-tools/cmdline-tools $HOME/android-sdk/cmdline-tools/latest
-          export ANDROID_HOME=$HOME/android-sdk
-          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH
-          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
-          echo "PATH=$PATH" >> $GITHUB_ENV
+          echo "y" | sdkmanager --install "system-images;android-30;default;x86"
+          echo "no" | avdmanager create avd -n test_emulator -k "system-images;android-30;default;x86"
 
-      - name: Install Required Android Components
+      - name: Start Emulator
         run: |
-          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
-          rm -rf $ANDROID_HOME/.android/cache
-          sdkmanager --update
-          yes | sdkmanager --licenses
-          sdkmanager --install "platform-tools" "platforms;android-31" "emulator"
-          sdkmanager --install "system-images;android-31;google_apis;x86" --channel=3 || \
-          (wget https://dl.google.com/android/repository/sys-img/google_apis/x86-31_r05.zip -O android_sysimg.zip && \
-          mkdir -p $ANDROID_HOME/system-images/android-31/google_apis/x86 && \
-          unzip android_sysimg.zip -d $ANDROID_HOME/system-images/android-31/google_apis/x86)
+          echo "Starting Emulator..."
+          emulator -avd test_emulator -no-window -no-audio -no-boot-anim &
 
-      - name: Use Prebuilt Emulator and Test APK
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 31
-          target: google_apis
-          arch: x86
-          profile: pixel_4
-          disable-animations: true
-          script: |
-            adb install extracted_apk/Shadow_Ops.apk
-            adb shell monkey -p com.example.shadowops -c android.intent.category.LAUNCHER 1
-            sleep 10  # Give app time to render
-            adb exec-out screencap -p > screenshot.png
+      - name: Wait for Emulator to Boot
+        run: |
+          adb wait-for-device
+          adb shell input keyevent 82
+        timeout-minutes: 5
 
-      - name: Upload Screenshot
-        uses: actions/upload-artifact@v4
-        with:
-          name: apk-screenshot
-          path: screenshot.png
+      - name: Install APK on Emulator
+        run: |
+          adb install extracted_apk/Shadow_Ops.apk
+
+      - name: Verify APK Installation
+        run: adb shell pm list packages | findstr "shadow_ops"
