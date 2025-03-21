@@ -40,6 +40,10 @@ jobs:
           export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
           yes | sdkmanager --licenses
           sdkmanager --install "platform-tools" "platforms;android-31" "emulator" "system-images;android-31;default;x86_64"
+          sleep 10  # Give time for installation to complete
+
+      - name: Manually Create AVD Directory (Fix Missing Issue)
+        run: mkdir -p $HOME/.android/avd
 
       - name: Create AVD
         run: |
