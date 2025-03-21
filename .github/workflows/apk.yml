@@ -17,7 +17,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Set up JDK 17 (required for Android SDK tools)
+      # Set up JDK 17
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
@@ -38,17 +38,31 @@ jobs:
           7z x apk/Shadow_Ops.7z.001 -oapk/extracted
           ls apk/extracted # List extracted files for debugging
 
-      # Start Android emulator
+      # Start ADB server
+      - name: Start ADB server
+        run: adb start-server
+
+      # Run Android emulator
       - name: Run Android emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 30 # Android API level (e.g., 30 for Android 11)
-          arch: x86_64 # Emulator architecture
-          profile: Nexus 6 # Device profile
+          api-level: 30
+          arch: x86_64
+          profile: Nexus 6
           script: |
-            adb devices # List connected devices
-            adb install apk/extracted/Shadow_Ops.apk # Install the APK
-            adb shell am start -n com.example.game/.MainActivity # Launch the game
+            adb devices
+            adb install apk/extracted/Shadow_Ops.apk
+            adb shell am start -n com.example.game/.MainActivity
+          disable-animations: true
+          disable-hw-accel: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-audio -no-boot-anim -accel off -no-snapshot -no-snapshot-save
+          boot-timeout: 600
+
+      # Capture emulator logs (for debugging)
+      - name: Capture emulator logs
+        run: |
+          adb logcat -d > emulator.log
+          cat emulator.log
 
       # Upload extracted APK (optional)
       - name: Upload APK
