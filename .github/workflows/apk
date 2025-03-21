@@ -1,0 +1,90 @@
+name: Run APK on macOS/Linux with VNC
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  run-apk:
+    runs-on: macos-latest  # or ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Install 7z (Linux only)
+      if: runner.os == 'Linux'
+      run: sudo apt-get install p7zip-full -y
+
+    - name: Install 7z (macOS only)
+      if: runner.os == 'macOS'
+      run: brew install p7zip
+
+    - name: Extract APK from 7z file
+      run: |
+        7z x Shadow_Ops.7z.001 -oapk
+        ls apk  # Verify the extracted APK file
+
+    - name: Set up JDK
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+
+    - name: Set up Android SDK
+      uses: android-actions/setup-android@v2
+
+    - name: Install Android Emulator
+      run: |
+        sdkmanager "system-images;android-30;google_apis;x86_64"
+        echo "no" | avdmanager create avd -n test -k "system-images;android-30;google_apis;x86_64" --force
+
+    - name: Install VNC Server
+      run: |
+        sudo apt-get update -y
+        sudo apt-get install -y xvfb x11vnc
+
+    - name: Start VNC Server
+      run: |
+        Xvfb :1 -screen 0 1280x720x24 &
+        export DISPLAY=:1
+        x11vnc -display :1 -forever -nopw -quiet &
+        echo "VNC server started. Use a VNC client to connect."
+
+    - name: Start Android Emulator
+      run: |
+        emulator -avd test -no-audio -no-boot-anim -no-window -gpu swiftshader_indirect &
+        adb wait-for-device
+        adb devices
+
+    - name: Install APK
+      run: adb install apk/Shadow_Ops.apk  # Adjust the path to your extracted APK
+
+    - name: Run APK
+      run: adb shell am start -n com.example.package/.MainActivity  # Adjust the package and activity name
+
+    - name: Capture Logs
+      run: |
+        adb logcat -d > logs.txt
+        echo "Logs captured."
+
+    - name: Upload Logs as Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: logs
+        path: logs.txt
+
+    - name: Take Screenshot
+      run: |
+        adb exec-out screencap -p > screenshot.png
+        echo "Screenshot taken."
+
+    - name: Upload Screenshot as Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: screenshot
+        path: screenshot.png
