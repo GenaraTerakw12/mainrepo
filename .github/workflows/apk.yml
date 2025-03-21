@@ -1,4 +1,4 @@
-name: Android Emulator Test
+name: Android Emulator Setup
 
 on:
   push:
@@ -20,10 +20,25 @@ jobs:
         run: |
           7z x Shadow_Ops.7z.001 -oextracted_apk
 
+      - name: Set Up Android SDK
+        run: |
+          echo "Downloading Android Command Line Tools..."
+          Invoke-WebRequest -Uri "https://dl.google.com/android/repository/commandlinetools-win-9477386_latest.zip" -OutFile "cmdline-tools.zip"
+          Expand-Archive cmdline-tools.zip -DestinationPath "C:\Android"
+          mkdir "C:\Android\cmdline-tools\latest"
+          Move-Item -Path "C:\Android\cmdline-tools\cmdline-tools" -Destination "C:\Android\cmdline-tools\latest"
+
+      - name: Configure Environment Variables
+        run: |
+          echo "ANDROID_HOME=C:\Android" | Out-File -FilePath $env:GITHUB_ENV -Append
+          echo "ANDROID_SDK_ROOT=C:\Android" | Out-File -FilePath $env:GITHUB_ENV -Append
+          echo "C:\Android\cmdline-tools\latest\bin" | Out-File -FilePath $env:GITHUB_PATH -Append
+          echo "C:\Android\platform-tools" | Out-File -FilePath $env:GITHUB_PATH -Append
+
       - name: Install Android SDK & Emulator
         run: |
-          echo "y" | sdkmanager --install "system-images;android-30;default;x86"
-          echo "no" | avdmanager create avd -n test_emulator -k "system-images;android-30;default;x86"
+          sdkmanager --sdk_root=C:\Android --install "platform-tools" "platforms;android-30" "system-images;android-30;default;x86_64" "emulator"
+          avdmanager create avd -n test_emulator -k "system-images;android-30;default;x86_64" --force
 
       - name: Start Emulator
         run: |
