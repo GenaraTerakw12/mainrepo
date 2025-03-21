@@ -1,0 +1,34 @@
+name: Unity Game Test
+
+on: [push, pull_request]
+
+jobs:
+  test-game:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: sudo apt-get install -y p7zip-full xvfb xdotool ffmpeg
+
+    - name: Extract the game archive
+      run: 7z x apk/Shadow_Ops.7z.001 -oapk/game
+
+    - name: Run game with virtual display
+      run: xvfb-run --auto-servernum apk/game/Shadow_Ops.x86_64 &
+
+    - name: Simulate Input
+      run: |
+        sleep 5
+        xdotool key space
+
+    - name: Start screen recording
+      run: ffmpeg -y -f x11grab -video_size 1280x720 -i :99 -t 30 -r 30 -pix_fmt yuv420p game_play.mp4 &
+
+    - name: Upload video
+      uses: actions/upload-artifact@v4
+      with:
+        name: game-play-video
+        path: game_play.mp4
