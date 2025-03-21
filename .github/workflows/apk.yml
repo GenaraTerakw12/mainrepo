@@ -1,90 +1,98 @@
-name: Run APK on macOS/Linux with VNC
+name: Run APK on GitHub Runner
 
-on:
+on: 
   push:
-    branches:
-      - main
   pull_request:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   run-apk:
-    runs-on: macos-latest  # or ubuntu-latest
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      # 📌 Checkout the repo
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Install 7z (Linux only)
-      if: runner.os == 'Linux'
-      run: sudo apt-get install p7zip-full -y
+      # 📌 Install p7zip to extract .7z files
+      - name: Install p7zip
+        run: sudo apt-get install -y p7zip-full
 
-    - name: Install 7z (macOS only)
-      if: runner.os == 'macOS'
-      run: brew install p7zip
+      # 📌 Extract APK from the 7z archive
+      - name: Extract APK
+        run: 7z x Shadow_Ops.7z.001 -oapk_files
 
-    - name: Extract APK from 7z file
-      run: |
-        7z x Shadow_Ops.7z.001 -oapk
-        ls apk  # Verify the extracted APK file
+      # 📌 Install Android SDK, Emulator, and ADB
+      - name: Install Android SDK & Emulator
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils
+          sudo apt-get install -y android-sdk adb
+          sudo apt-get install -y unzip wget
+          mkdir -p $HOME/android-sdk/cmdline-tools
+          wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
+          unzip commandlinetools-linux-9477386_latest.zip -d $HOME/android-sdk/cmdline-tools
+          export PATH=$HOME/android-sdk/cmdline-tools/bin:$PATH
+          yes | sdkmanager --licenses
+          sdkmanager --install "platform-tools" "emulator" "system-images;android-30;google_apis;x86_64"
 
-    - name: Set up JDK
-      uses: actions/setup-java@v3
-      with:
-        java-version: '11'
-        distribution: 'temurin'
+      # 📌 Create and Start the Android Emulator
+      - name: Start Android Emulator
+        run: |
+          echo "no" | avdmanager create avd -n test_emulator -k "system-images;android-30;google_apis;x86_64"
+          nohup emulator -avd test_emulator -no-snapshot -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -qemu > emulator.log 2>&1 &
+          sleep 90  # Give the emulator time to boot
 
-    - name: Set up Android SDK
-      uses: android-actions/setup-android@v2
+      # 📌 Install the APK
+      - name: Install APK
+        run: adb install apk_files/Shadow_Ops.apk
 
-    - name: Install Android Emulator
-      run: |
-        sdkmanager "system-images;android-30;google_apis;x86_64"
-        echo "no" | avdmanager create avd -n test -k "system-images;android-30;google_apis;x86_64" --force
+      # 📌 Launch the App
+      - name: Launch App
+        run: adb shell monkey -p com.your.app.package.name -c android.intent.category.LAUNCHER 1
+        continue-on-error: true  # Ignore errors if package name is unknown
 
-    - name: Install VNC Server
-      run: |
-        sudo apt-get update -y
-        sudo apt-get install -y xvfb x11vnc
+      # 📌 Take a Screenshot and Upload as Artifact
+      - name: Capture Screenshot
+        run: |
+          adb shell screencap -p /sdcard/screenshot.png
+          adb pull /sdcard/screenshot.png .
+      
+      - name: Upload Screenshot
+        uses: actions/upload-artifact@v3
+        with:
+          name: emulator-screenshot
+          path: screenshot.png
 
-    - name: Start VNC Server
-      run: |
-        Xvfb :1 -screen 0 1280x720x24 &
-        export DISPLAY=:1
-        x11vnc -display :1 -forever -nopw -quiet &
-        echo "VNC server started. Use a VNC client to connect."
+      # 📌 Install Scrcpy for screen streaming
+      - name: Install Scrcpy
+        run: sudo apt install -y scrcpy
 
-    - name: Start Android Emulator
-      run: |
-        emulator -avd test -no-audio -no-boot-anim -no-window -gpu swiftshader_indirect &
-        adb wait-for-device
-        adb devices
+      # 📌 Install Ngrok
+      - name: Install Ngrok
+        run: |
+          curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null
+          echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | sudo tee /etc/apt/sources.list.d/ngrok.list
+          sudo apt update && sudo apt install ngrok
+          ngrok authtoken YOUR_NGROK_AUTH_TOKEN  # Replace with your ngrok auth token
 
-    - name: Install APK
-      run: adb install apk/Shadow_Ops.apk  # Adjust the path to your extracted APK
+      # 📌 Start Scrcpy Stream and Ngrok
+      - name: Start Emulator Stream
+        run: |
+          nohup scrcpy --tcpip --listen-port=8080 > scrcpy.log 2>&1 &
+          ngrok http 8080 > ngrok.log &
+          sleep 10
+          curl -s localhost:4040/api/tunnels | jq -r '.tunnels[0].public_url' > ngrok_url.txt
+          cat ngrok_url.txt
 
-    - name: Run APK
-      run: adb shell am start -n com.example.package/.MainActivity  # Adjust the package and activity name
+      # 📌 Show Ngrok Public URL
+      - name: Show Public Stream URL
+        run: cat ngrok_url.txt
 
-    - name: Capture Logs
-      run: |
-        adb logcat -d > logs.txt
-        echo "Logs captured."
-
-    - name: Upload Logs as Artifact
-      uses: actions/upload-artifact@v2  # Use a specific version
-      with:
-        name: logs
-        path: logs.txt
-
-    - name: Take Screenshot
-      run: |
-        adb exec-out screencap -p > screenshot.png
-        echo "Screenshot taken."
-
-    - name: Upload Screenshot as Artifact
-      uses: actions/upload-artifact@v3.1.2  # Use a specific version
-      with:
-        name: screenshot
-        path: screenshot.png
+      # 📌 Upload Ngrok URL as an Artifact
+      - name: Upload Stream URL
+        uses: actions/upload-artifact@v3
+        with:
+          name: emulator-stream-url
+          path: ngrok_url.txt
