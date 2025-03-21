@@ -22,76 +22,19 @@ jobs:
       - name: Verify APK Extraction
         run: ls -lah extracted_apk
 
-      - name: Install Android SDK & Emulator
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y wget unzip
-          wget https://dl.google.com/android/repository/commandlinetools-linux-10406996_latest.zip -O android_cmdline.zip
-          mkdir -p $HOME/android-sdk/cmdline-tools
-          unzip android_cmdline.zip -d $HOME/android-sdk/cmdline-tools
-          mv $HOME/android-sdk/cmdline-tools/cmdline-tools $HOME/android-sdk/cmdline-tools/latest
-          export ANDROID_HOME=$HOME/android-sdk
-          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH
-          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
-          echo "PATH=$PATH" >> $GITHUB_ENV
-
-      - name: Install Required Android Components
-        run: |
-          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
-          yes | sdkmanager --licenses
-          sdkmanager --update
-          sdkmanager --install "platform-tools" "platforms;android-31" "emulator"
-          sdkmanager --install "system-images;android-31;google_apis;x86" --channel=3
-
-      - name: Manually Create AVD Directory (Fix Missing Issue)
-        run: mkdir -p $HOME/.android/avd
-
-      - name: Create AVD
-        run: |
-          export ANDROID_AVD_HOME=$HOME/.android/avd
-          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
-          echo "no" | avdmanager create avd -n test_emulator -k "system-images;android-31;google_apis;x86" --device "pixel_4" --force
-          ls -lah $HOME/.android/avd/
-
-      - name: Verify AVD Exists
-        run: |
-          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
-          avdmanager list avd
-          ls -lah $HOME/.android/avd/
-
-      - name: Start Emulator (Faster)
-        run: |
-          export PATH=$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools:$PATH
-          nohup emulator -avd test_emulator -no-audio -no-window -gpu swiftshader_indirect -no-boot-anim -accel on -qemu -m 2048 &
-
-      - name: Wait for Emulator to Boot (Max 5 Min)
-        run: |
-          export PATH=$ANDROID_HOME/platform-tools:$PATH
-          adb wait-for-device
-          max_wait_time=300  # 5 min max
-          elapsed_time=0
-
-          while [[ "$(adb shell getprop sys.boot_completed 2>/dev/null)" != "1" && $elapsed_time -lt $max_wait_time ]]; do
-            echo "Waiting for emulator to boot... ($elapsed_time sec)"
-            sleep 10
-            elapsed_time=$((elapsed_time + 10))
-          done
-
-          if [[ "$(adb shell getprop sys.boot_completed 2>/dev/null)" != "1" ]]; then
-            echo "❌ Emulator failed to boot in $max_wait_time seconds"
-            exit 1
-          fi
-
-          echo "✅ Emulator booted successfully!"
-
-      - name: Install APK on Emulator
-        run: adb install extracted_apk/Shadow_Ops.apk
-
-      - name: Launch APK
-        run: adb shell monkey -p com.example.shadowops -c android.intent.category.LAUNCHER 1
-
-      - name: Capture Screenshot
-        run: adb exec-out screencap -p > screenshot.png
+      - name: Run Prebuilt Emulator and Test APK
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 31
+          target: google_apis
+          arch: x86
+          profile: pixel_4
+          disable-animations: true
+          script: |
+            adb install extracted_apk/Shadow_Ops.apk
+            adb shell monkey -p com.example.shadowops -c android.intent.category.LAUNCHER 1
+            sleep 10  # Give app time to render
+            adb exec-out screencap -p > screenshot.png
 
       - name: Upload Screenshot
         uses: actions/upload-artifact@v4
