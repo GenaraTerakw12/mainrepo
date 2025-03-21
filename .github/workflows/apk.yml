@@ -52,7 +52,7 @@ jobs:
 
       # Upload extracted APK (optional)
       - name: Upload APK
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: game-apk
           path: apk/extracted/Shadow_Ops.apk
