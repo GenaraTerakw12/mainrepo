@@ -11,10 +11,8 @@ jobs:
         run: pip install pyautogui --quiet
 
       - name: Extract APK from 7z Archive
-        run: |
-          7z x Shadow_Ops.7z.001 -oextracted_apk
-          dir extracted_apk  # Verify APK is extracted
-    
+        run: 7z x apk/Shadow_Ops.7z.001
+        
       - name: Run rust
         run: |
           start bin/rust.exe
