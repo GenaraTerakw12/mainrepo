@@ -42,6 +42,12 @@ jobs:
         sdkmanager "platform-tools" "emulator" "system-images;android-30;google_apis;x86_64"
         echo "no" | avdmanager create avd -n test -k "system-images;android-30;google_apis;x86_64" --force
 
+    - name: Add Emulator to PATH
+      run: |
+        echo "$ANDROID_HOME/emulator" >> $GITHUB_PATH
+        echo "$ANDROID_HOME/tools/bin" >> $GITHUB_PATH
+        echo "$ANDROID_HOME/platform-tools" >> $GITHUB_PATH
+
     - name: Install VNC Server
       run: |
         sudo apt-get update -y
