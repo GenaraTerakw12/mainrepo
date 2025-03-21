@@ -92,7 +92,7 @@ jobs:
 
       # 📌 Upload Ngrok URL as an Artifact
       - name: Upload Stream URL
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: emulator-stream-url
           path: ngrok_url.txt
