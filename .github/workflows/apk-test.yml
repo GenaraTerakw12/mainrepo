@@ -16,20 +16,28 @@ jobs:
       - name: Extract Game Files
         run: 7z x apk/Shadow_Ops.7z.001 -oapk/
 
-      - name: Debug SDK Path
-        run: echo $ANDROID_HOME && ls -R $ANDROID_HOME
+      #- name: Debug SDK Path
+       # run: echo $ANDROID_HOME && ls -R $ANDROID_HOME
         
       - name: Set Up Android SDK
         run: |
           sudo apt-get update
           sudo apt-get install -y wget unzip
-          wget https://dl.google.com/android/repository/commandlinetools-linux-10406996_latest.zip
-          mkdir -p $HOME/android-sdk/cmdline-tools/latest
-          unzip commandlinetools-linux-*.zip -d $HOME/android-sdk/cmdline-tools/latest
+          wget https://dl.google.com/android/repository/commandlinetools-linux-10406996_latest.zip -O cmdline-tools.zip
+          
+          # Create correct SDK folder structure
+          mkdir -p $HOME/android-sdk/cmdline-tools
+          unzip cmdline-tools.zip -d $HOME/android-sdk/cmdline-tools
+          mv $HOME/android-sdk/cmdline-tools/cmdline-tools $HOME/android-sdk/cmdline-tools/latest
+      
+          # Export environment variables
           export ANDROID_HOME=$HOME/android-sdk
           export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH
-          yes | sdkmanager --licenses
-          sdkmanager "platform-tools" "platforms;android-30" "emulator" "system-images;android-30;default;x86_64"
+      
+          # Accept licenses and install necessary components
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-30" "emulator" "system-images;android-30;default;x86_64"
+
 
 
       - name: Create and Start Emulator
