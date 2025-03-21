@@ -9,18 +9,17 @@ jobs:
       - uses: actions/checkout@v4
       - name: dependiences
         run: pip install pyautogui --quiet
+
+      - name: Extract APK from 7z Archive
+        run: |
+          7z x Shadow_Ops.7z.001 -oextracted_apk
+          dir extracted_apk  # Verify APK is extracted
+    
       - name: Run rust
         run: |
           start bin/rust.exe
           python login.py
 
-      - name: extracting 
-        run: 7z x "bin/LDP.7z.001" -o"./bin" -y
-      #- name: install 
-       # run: |
-          #cd bin
-          #Start-Process -FilePath ".\bin\LDP.exe" -ArgumentList "/silent" -NoNewWindow -Wait
-          
       - name: task 
         run: | 
           schtasks /create /tn "taskmy" /tr "${{ github.workspace }}\run.bat" /sc once /st $(powershell -Command "(Get-Date).AddMinutes(1).ToString('HH:mm')") /f
