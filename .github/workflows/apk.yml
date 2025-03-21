@@ -17,11 +17,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Set up JDK (required for Android tools)
-      - name: Set up JDK
+      # Set up JDK 17 (required for Android SDK tools)
+      - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
-          java-version: '11'
+          java-version: '17'
           distribution: 'temurin'
 
       # Set up Android SDK
@@ -52,7 +52,7 @@ jobs:
 
       # Upload extracted APK (optional)
       - name: Upload APK
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: game-apk
           path: apk/extracted/Shadow_Ops.apk
