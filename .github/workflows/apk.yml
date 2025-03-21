@@ -52,14 +52,13 @@ jobs:
 
       - name: Accept Android SDK Licenses
         run: |
-          echo "y" | C:\Android\cmdline-tools\latest\bin\sdkmanager.bat --licenses || true
-
+          yes | C:\Android\cmdline-tools\latest\bin\sdkmanager.bat --licenses
 
       - name: Install Android SDK & Emulator
         run: |
-          C:\Android\cmdline-tools\latest\cmdline-tools\bin\sdkmanager.bat --install "platform-tools" "platforms;android-30" "system-images;android-30;default;x86_64" "emulator"
-          C:\Android\cmdline-tools\latest\cmdline-tools\bin\avdmanager.bat create avd -n test_emulator -k "system-images;android-30;default;x86_64" --force
-
+          C:\Android\cmdline-tools\latest\bin\sdkmanager.bat --install "platform-tools" "platforms;android-30" "system-images;android-30;default;x86_64" "emulator"
+     
+      
       - name: Start Emulator
         run: |
           emulator -avd test_emulator -no-window -no-audio -no-boot-anim &
