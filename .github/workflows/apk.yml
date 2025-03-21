@@ -39,8 +39,9 @@ jobs:
         run: |
           export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
           yes | sdkmanager --licenses
-          sdkmanager --install "platform-tools" "platforms;android-31" "emulator" "system-images;android-31;default;x86"
-          sleep 10  # Give time for installation to complete
+          sdkmanager --update
+          sdkmanager --install "platform-tools" "platforms;android-31" "emulator"
+          sdkmanager --install "system-images;android-31;google_apis;x86" --channel=3
 
       - name: Manually Create AVD Directory (Fix Missing Issue)
         run: mkdir -p $HOME/.android/avd
@@ -49,7 +50,7 @@ jobs:
         run: |
           export ANDROID_AVD_HOME=$HOME/.android/avd
           export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
-          echo "no" | avdmanager create avd -n test_emulator -k "system-images;android-31;default;x86" --device "pixel_4" --force
+          echo "no" | avdmanager create avd -n test_emulator -k "system-images;android-31;google_apis;x86" --device "pixel_4" --force
           ls -lah $HOME/.android/avd/
 
       - name: Verify AVD Exists
