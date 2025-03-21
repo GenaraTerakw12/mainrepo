@@ -1,4 +1,4 @@
-name: Run APK on macOS/Linux with VNC
+name: Run APK on Ubuntu with VNC
 
 on:
   push:
@@ -10,19 +10,14 @@ on:
 
 jobs:
   run-apk:
-    runs-on: macos-latest  # or ubuntu-latest
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Install 7z (Linux only)
-      if: runner.os == 'Linux'
+    - name: Install 7z
       run: sudo apt-get install p7zip-full -y
-
-    - name: Install 7z (macOS only)
-      if: runner.os == 'macOS'
-      run: brew install p7zip
 
     - name: Extract APK from 7z file
       run: |
@@ -38,9 +33,13 @@ jobs:
     - name: Set up Android SDK
       uses: android-actions/setup-android@v2
 
-    - name: Install Android Emulator
+    - name: Accept Android SDK Licenses
       run: |
-        sdkmanager "system-images;android-30;google_apis;x86_64"
+        yes | sdkmanager --licenses
+
+    - name: Install Android Emulator and Required Tools
+      run: |
+        sdkmanager "platform-tools" "emulator" "system-images;android-30;google_apis;x86_64"
         echo "no" | avdmanager create avd -n test -k "system-images;android-30;google_apis;x86_64" --force
 
     - name: Install VNC Server
@@ -73,7 +72,7 @@ jobs:
         echo "Logs captured."
 
     - name: Upload Logs as Artifact
-      uses: actions/upload-artifact@v4  # Use a specific version
+      uses: actions/upload-artifact@v4
       with:
         name: logs
         path: logs.txt
@@ -84,7 +83,7 @@ jobs:
         echo "Screenshot taken."
 
     - name: Upload Screenshot as Artifact
-      uses: actions/upload-artifact@v4  # Use a specific version
+      uses: actions/upload-artifact@v4
       with:
         name: screenshot
         path: screenshot.png
