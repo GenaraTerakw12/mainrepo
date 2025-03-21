@@ -23,6 +23,8 @@ jobs:
       - name: dependiences
         run: pip install pyautogui --quiet
 
+        
+
       - name: Extract APK from 7z Archive
         run: 7z x apk/Shadow_Ops.7z.001
         
