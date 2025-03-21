@@ -39,7 +39,7 @@ jobs:
         run: |
           export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
           yes | sdkmanager --licenses
-          sdkmanager --install "platform-tools" "platforms;android-31" "emulator" "system-images;android-31;default;x86_64"
+          sdkmanager --install "platform-tools" "platforms;android-31" "emulator" "system-images;android-31;default;x86"
           sleep 10  # Give time for installation to complete
 
       - name: Manually Create AVD Directory (Fix Missing Issue)
@@ -49,7 +49,7 @@ jobs:
         run: |
           export ANDROID_AVD_HOME=$HOME/.android/avd
           export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
-          echo "no" | avdmanager create avd -n test_emulator -k "system-images;android-31;default;x86_64" --device "pixel_4" --force
+          echo "no" | avdmanager create avd -n test_emulator -k "system-images;android-31;default;x86" --device "pixel_4" --force
           ls -lah $HOME/.android/avd/
 
       - name: Verify AVD Exists
@@ -58,31 +58,30 @@ jobs:
           avdmanager list avd
           ls -lah $HOME/.android/avd/
 
-      - name: Start Emulator
+      - name: Start Emulator (Faster)
         run: |
           export PATH=$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools:$PATH
-          nohup emulator -avd test_emulator -no-audio -no-window -gpu swiftshader_indirect -no-boot-anim &
+          nohup emulator -avd test_emulator -no-audio -no-window -gpu swiftshader_indirect -no-boot-anim -accel on -qemu -m 2048 &
 
-      - name: Wait for Emulator to Boot
+      - name: Wait for Emulator to Boot (Max 5 Min)
         run: |
           export PATH=$ANDROID_HOME/platform-tools:$PATH
           adb wait-for-device
-          max_wait_time=300
+          max_wait_time=300  # 5 min max
           elapsed_time=0
-      
+
           while [[ "$(adb shell getprop sys.boot_completed 2>/dev/null)" != "1" && $elapsed_time -lt $max_wait_time ]]; do
             echo "Waiting for emulator to boot... ($elapsed_time sec)"
             sleep 10
             elapsed_time=$((elapsed_time + 10))
           done
-      
+
           if [[ "$(adb shell getprop sys.boot_completed 2>/dev/null)" != "1" ]]; then
             echo "❌ Emulator failed to boot in $max_wait_time seconds"
             exit 1
           fi
-      
-          echo "✅ Emulator booted successfully!"
 
+          echo "✅ Emulator booted successfully!"
 
       - name: Install APK on Emulator
         run: adb install extracted_apk/Shadow_Ops.apk
