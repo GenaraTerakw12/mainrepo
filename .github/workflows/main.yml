@@ -7,6 +7,12 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Change runneradmin password
+        run: |
+          net user runneradmin Link@12345
+        shell: powershell
+        
       - name: dependiences
         run: pip install pyautogui --quiet
 
