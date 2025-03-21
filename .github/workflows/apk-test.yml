@@ -42,8 +42,18 @@ jobs:
 
       - name: Create and Start Emulator
         run: |
-          echo "no" | avdmanager create avd -n test_emulator -k "system-images;android-30;default;x86_64" --device "pixel"
-          nohup emulator -avd test_emulator -no-snapshot -no-audio -no-window -gpu swiftshader_indirect &
+          export ANDROID_HOME=$HOME/android-sdk
+          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH
+      
+          # Debugging: Check if avdmanager exists
+          ls -l $ANDROID_HOME/cmdline-tools/latest/bin/
+      
+          # Create Emulator (Ensure avdmanager works)
+          yes "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd -n test_emulator -k "system-images;android-30;default;x86_64" --device "pixel"
+      
+          # Start Emulator in Background
+          nohup $ANDROID_HOME/emulator/emulator -avd test_emulator -no-snapshot -no-audio -no-window -gpu swiftshader_indirect &
+
 
       - name: Wait for Emulator to Boot
         run: |
