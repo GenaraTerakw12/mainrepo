@@ -46,7 +46,13 @@ jobs:
           echo "ANDROID_SDK_ROOT=C:\Android" | Out-File -FilePath $env:GITHUB_ENV -Append
           echo "C:\Android\cmdline-tools\latest\bin" | Out-File -FilePath $env:GITHUB_PATH -Append
           echo "C:\Android\platform-tools" | Out-File -FilePath $env:GITHUB_PATH -Append
-
+      
+      - name: Install Java 11
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+          
       - name: Install Android SDK & Emulator
         run: |
           sdkmanager --sdk_root=C:\Android --install "platform-tools" "platforms;android-30" "system-images;android-30;default;x86_64" "emulator"
