@@ -1,95 +1,54 @@
-name: Run APK on Ubuntu with VNC
+name: Android APK Test
 
 on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
 
 jobs:
-  run-apk:
+  test-apk:
     runs-on: ubuntu-latest
-
+    
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-    - name: Install 7z
-      run: sudo apt-get install p7zip-full -y
+      - name: Install 7-Zip
+        run: sudo apt-get install p7zip-full -y
 
-    - name: Extract APK from 7z file
-      run: |
-        7z x Shadow_Ops.7z.001 -oapk
-        ls apk  # Verify the extracted APK file
+      - name: Extract APK
+        run: 7z x Shadow_Ops.7z.001 -oextracted_apk
 
-    - name: Set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'temurin'
+      - name: Verify APK Extraction
+        run: ls -lah extracted_apk
 
-    - name: Set up Android SDK
-      uses: android-actions/setup-android@v2
+      - name: Install Android SDK & Emulator
+        uses: android-actions/setup-android@v3
 
-    - name: Accept Android SDK Licenses
-      run: |
-        yes | sdkmanager --licenses
+      - name: Create & Start Emulator
+        run: |
+          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "system-images;android-31;default;x86_64"
+          echo "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd -n test_emulator -k "system-images;android-31;default;x86_64" --device "pixel_4"
+          $ANDROID_HOME/emulator/emulator -avd test_emulator -no-audio -no-window -gpu swiftshader_indirect &
 
-    - name: Install Android Emulator and Required Tools
-      run: |
-        sdkmanager "platform-tools" "emulator" "system-images;android-30;google_apis;x86_64"
-        echo "no" | avdmanager create avd -n test -k "system-images;android-30;google_apis;x86_64" --force
+      - name: Wait for Emulator to Start
+        run: |
+          adb wait-for-device
+          adb shell settings put global window_animation_scale 0
+          adb shell settings put global transition_animation_scale 0
+          adb shell settings put global animator_duration_scale 0
 
-    - name: Add Emulator to PATH
-      run: |
-        echo "$ANDROID_HOME/emulator" >> $GITHUB_PATH
-        echo "$ANDROID_HOME/tools/bin" >> $GITHUB_PATH
-        echo "$ANDROID_HOME/platform-tools" >> $GITHUB_PATH
+      - name: Install APK on Emulator
+        run: adb install extracted_apk/Shadow_Ops.apk
 
-    - name: Install VNC Server
-      run: |
-        sudo apt-get update -y
-        sudo apt-get install -y xvfb x11vnc
+      - name: Launch APK
+        run: adb shell monkey -p com.example.shadowops -c android.intent.category.LAUNCHER 1
 
-    - name: Start VNC Server
-      run: |
-        Xvfb :1 -screen 0 1280x720x24 &
-        export DISPLAY=:1
-        x11vnc -display :1 -forever -nopw -quiet &
-        echo "VNC server started. Use a VNC client to connect."
+      - name: Capture Screenshot
+        run: adb exec-out screencap -p > screenshot.png
 
-    - name: Start Android Emulator
-      run: |
-        emulator -avd test -no-audio -no-boot-anim -no-window -gpu swiftshader_indirect &
-        adb wait-for-device
-        adb devices
-
-    - name: Install APK
-      run: adb install apk/Shadow_Ops.apk  # Adjust the path to your extracted APK
-
-    - name: Run APK
-      run: adb shell am start -n com.example.package/.MainActivity  # Adjust the package and activity name
-
-    - name: Capture Logs
-      run: |
-        adb logcat -d > logs.txt
-        echo "Logs captured."
-
-    - name: Upload Logs as Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: logs
-        path: logs.txt
-
-    - name: Take Screenshot
-      run: |
-        adb exec-out screencap -p > screenshot.png
-        echo "Screenshot taken."
-
-    - name: Upload Screenshot as Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: screenshot
-        path: screenshot.png
+      - name: Upload Screenshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: apk-screenshot
+          path: screenshot.png
