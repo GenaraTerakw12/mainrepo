@@ -24,21 +24,10 @@ jobs:
         run: |
           echo "Downloading Android Command Line Tools..."
           Invoke-WebRequest -Uri "https://dl.google.com/android/repository/commandlinetools-win-9477386_latest.zip" -OutFile "cmdline-tools.zip"
-          Expand-Archive cmdline-tools.zip -DestinationPath "C:\Android\cmdline-tools"
+          Expand-Archive cmdline-tools.zip -DestinationPath "C:\Android"
 
-          # Find actual extracted folder name
-          Get-ChildItem -Path "C:\Android\cmdline-tools" | ForEach-Object { echo "Found: $_.Name" }
-
-          # Move extracted folder into expected structure
-          $extractedFolder = Get-ChildItem -Path "C:\Android\cmdline-tools" | Where-Object { $_.Name -match "cmdline-tools" } | Select-Object -ExpandProperty Name
-          if ($extractedFolder) {
-            Move-Item -Path "C:\Android\cmdline-tools\$extractedFolder" -Destination "C:\Android\cmdline-tools\latest" -Force
-          } else {
-            echo "Error: Command line tools folder not found!"
-            exit 1
-          }
-
-
+          # Ensure correct folder structure
+          Move-Item -Path "C:\Android\cmdline-tools" -Destination "C:\Android\cmdline-tools\latest" -Force
 
       - name: Configure Environment Variables
         run: |
@@ -46,22 +35,22 @@ jobs:
           echo "ANDROID_SDK_ROOT=C:\Android" | Out-File -FilePath $env:GITHUB_ENV -Append
           echo "C:\Android\cmdline-tools\latest\bin" | Out-File -FilePath $env:GITHUB_PATH -Append
           echo "C:\Android\platform-tools" | Out-File -FilePath $env:GITHUB_PATH -Append
-      
+          echo "C:\Android\emulator" | Out-File -FilePath $env:GITHUB_PATH -Append
+
       - name: Install Java 11
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '11'
-      
+
       - name: Accept Android SDK Licenses
         run: |
           echo y | C:\Android\cmdline-tools\latest\bin\sdkmanager.bat --licenses
 
-
       - name: Install Android SDK & Emulator
         run: |
-          sdkmanager --sdk_root=C:\Android --install "platform-tools" "platforms;android-30" "system-images;android-30;default;x86_64" "emulator"
-          avdmanager create avd -n test_emulator -k "system-images;android-30;default;x86_64" --force
+          C:\Android\cmdline-tools\latest\bin\sdkmanager.bat --sdk_root=C:\Android --install "platform-tools" "platforms;android-30" "system-images;android-30;default;x86_64" "emulator"
+          C:\Android\cmdline-tools\latest\bin\avdmanager.bat create avd -n test_emulator -k "system-images;android-30;default;x86_64" --force
 
       - name: Start Emulator
         run: |
