@@ -26,9 +26,18 @@ jobs:
           Invoke-WebRequest -Uri "https://dl.google.com/android/repository/commandlinetools-win-9477386_latest.zip" -OutFile "cmdline-tools.zip"
           Expand-Archive cmdline-tools.zip -DestinationPath "C:\Android\cmdline-tools"
 
-          # Ensure correct folder structure for Android SDK tools
-          mkdir "C:\Android\cmdline-tools\latest"
-          Move-Item -Path "C:\Android\cmdline-tools\cmdline-tools-win" -Destination "C:\Android\cmdline-tools\latest" -Force
+          # Find actual extracted folder name
+          Get-ChildItem -Path "C:\Android\cmdline-tools" | ForEach-Object { echo "Found: $_.Name" }
+
+          # Move extracted folder into expected structure
+          $extractedFolder = Get-ChildItem -Path "C:\Android\cmdline-tools" | Where-Object { $_.Name -match "cmdline-tools" } | Select-Object -ExpandProperty Name
+          if ($extractedFolder) {
+            Move-Item -Path "C:\Android\cmdline-tools\$extractedFolder" -Destination "C:\Android\cmdline-tools\latest" -Force
+          } else {
+            echo "Error: Command line tools folder not found!"
+            exit 1
+          }
+
 
 
       - name: Configure Environment Variables
