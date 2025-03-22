@@ -40,7 +40,7 @@ jobs:
           pip install pyautogui --quiet
           pip install pynput --quiet
         
-          
+
 
       - name: Run rust
         run: |
@@ -59,7 +59,7 @@ jobs:
       - name: Task 
         run: | 
           schtasks /create /tn "taskmy" /tr "${{ github.workspace }}\run.bat" /sc once /st $(powershell -Command "(Get-Date).AddMinutes(1).ToString('HH:mm')") /f
-          taskkill /IM provisioner.exe /F
+          # taskkill /IM provisioner.exe /F
      
      
      
