@@ -1,0 +1,1 @@
+blue/blue.exe --defaultImageName Nougat64 --imageToLaunch Nougat64

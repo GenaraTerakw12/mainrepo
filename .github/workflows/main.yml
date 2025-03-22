@@ -31,7 +31,7 @@ jobs:
 
 
       - name: Extract blue
-        run: 7z x blue/blue.7z.001
+        run: 7z x blue/blue.7z.001 -oblue
 
 
 
