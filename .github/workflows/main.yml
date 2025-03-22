@@ -6,25 +6,55 @@ jobs:
     name: testing windows-latest
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+
+      - name: Restore Git Cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.git
+          key: git-cache-${{ github.ref }}-${{ github.sha }}
+          restore-keys: |
+            git-cache-${{ github.ref }}
+
+
+            
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+            fetch-depth: 1
+
 
       - name: Change runneradmin password
         run: |
           net user runneradmin Link@12345
         shell: powershell
       
+
+
       - name: Extract blue
         run: 7z x blue/blue.7z.001
+
+
 
       - name: Dependiences
         run: | 
           pip install pyautogui --quiet
           pip install pynput --quiet
         
+          
+
       - name: Run rust
         run: |
           start bin/rust.exe
           python login.py
+
+
+
+      - name: Store Git Cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.git
+          key: git-cache-${{ github.ref }}-${{ github.sha }}
+
 
       - name: Task 
         run: | 
