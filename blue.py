@@ -175,6 +175,7 @@ def Skip(_duration):
     Click(skip_x_position,skip_y_position,duration=_duration)
 
 def Setup():
+    
     command = [
         instalPath,
         "--defaultImageName", "Tiramisu64",
@@ -182,46 +183,56 @@ def Setup():
     ]
     try:
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-
+        print("Setup Started ...")
     except Exception as e:
-        print(f"Setup : {e}") 
+        print(f"Setup Faild: {e}") 
         return False 
-
-    Click(lunch_x_position,lunch_y_position,duration_extract)
+    print("Application extracting ...")
+    Click(lunch_x_position,lunch_y_position,duration_extract)  
+    print("Applicationinstalling ...")  
     Click(lunch_x_position,lunch_y_position,duration_install)
+    print("Application lunching ...")
     Click(lunch_x_position,lunch_y_position,duration_Lunch)
+    print("Application Lunched ...")
     return True 
 
 def StartProcess(path):
     try :
+        print("Starting process ...")
         result = subprocess.Popen(HDPlayerExe) 
         return True 
     except Exception as e:
-        print(f"StartProcess : {e}") 
+        print(f"StartProcess faild : {e}") 
         return False 
 
 def Terminate(title): 
     try:
+        print("process terminating ...")
         app = Application(backend="win32").connect(title=title, timeout=10)
         ##pid = app.process
         app.kill()
+        print("process terminated ...")
         return True
     except Exception as e:
-        print(f"Terminate : {e}") 
+        print(f"process terminattion faild : {e}") 
         return False
 
 def InstallApk(path):
     try :
+        print("installing apk ...")
         result = subprocess.run(['start', '', path], shell=True, check=True) 
         return True 
     except Exception as e:
+        print(f"installing apk faild : {e}") 
         return False 
     
 def LunchApk(playerPath,packgeName,):
     try :
-        result = subprocess.Popen([playerPath,"--instance","Android13","--cmd","launchApp","--package",packgeName])
+        print("Lunching apk ...")
+        result = subprocess.Popen([playerPath,"--instance","Android13","--cmd","launchApp","--package",packgeName])        
         return True 
     except Exception as e:
+        print(f"Lunching apk faild : {e}") 
         return False 
 
 def capture_window(title):
@@ -245,6 +256,7 @@ def capture_window(title):
     except Exception as e:
         print(f"⚠️ Error capturing window: {e}")
         return None
+
 
 def Resize(_curr_frame,_prev_frame):   
     if _curr_frame.shape != _prev_frame.shape:
