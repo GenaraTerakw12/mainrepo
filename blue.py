@@ -225,7 +225,7 @@ def InstallApk(path):
         return True 
     except Exception as e:
         print(f"installing apk faild : {e}") 
-        return False 
+        return False
     
 def LunchApk(playerPath,packgeName,):
     try :
@@ -458,7 +458,7 @@ def loop():
 
 if __name__ == "__main__":
 
-    main(True,True)
+    #main(True,True)
     loop()
 
     
