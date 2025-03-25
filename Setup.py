@@ -182,7 +182,7 @@ time.sleep(60)
 install_apk(APK_PATH) 
 time.sleep(60)
 
-launch_apk(HD_PLAYER_EXE,"com.elnimr.shadowops")
+launch_apk(APK_PATH,"com.elnimr.shadowops")
 time.sleep(60)
 
 print("Confirmation check")
