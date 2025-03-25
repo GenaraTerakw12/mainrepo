@@ -58,33 +58,34 @@ toolbar_width       = 40
 progress_bar_height_g = 4 
 toolbar_width_g       = 40
 
+
 duration_extract = 18 
-duration_extract_g = 46
+duration_extract_g = 60
 
 duration_install = 2 
-duration_install_g = 3 
+duration_install_g = 4
 
-duration_Lunch = 400 
+duration_Lunch = 120 
 duration_Lunch_g = 400 
 
 
 sleep_setup = 2
-sleep_setup_g = 2
+sleep_setup_g = 4
 
 sleep_Terminate = 2
-sleep_Terminate_g = 2
+sleep_Terminate_g = 4
 
 sleep_StartProcess  = 30
-sleep_StartProcess_g  = 60
+sleep_StartProcess_g  = 120
 
 sleep_InstallApk  = 10
-sleep_InstallApk_g  = 30
+sleep_InstallApk_g  = 60
 
 sleep_LunchApk = 10
 sleep_LunchApk_g = 30
 
 sleep_confirm = 2
-sleep_confirm_g = 2
+sleep_confirm_g = 4
 
 
 
