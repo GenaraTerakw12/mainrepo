@@ -58,6 +58,39 @@ toolbar_width       = 40
 progress_bar_height_g = 4 
 toolbar_width_g       = 40
 
+duration_extract = 18 
+duration_extract_g = 46
+
+duration_install = 2 
+duration_install_g = 3 
+
+duration_Lunch = 400 
+duration_Lunch_g = 400 
+
+
+sleep_setup = 2
+sleep_setup_g = 2
+
+sleep_Terminate = 2
+sleep_Terminate_g = 2
+
+sleep_StartProcess  = 30
+sleep_StartProcess_g  = 60
+
+sleep_InstallApk  = 10
+sleep_InstallApk_g  = 30
+
+sleep_LunchApk = 10
+sleep_LunchApk_g = 30
+
+sleep_confirm = 2
+sleep_confirm_g = 2
+
+
+
+
+
+
 
 startTime       = datetime.now()
 motion          = False 
@@ -65,6 +98,7 @@ isRunningAds    = False
 ad_duration     = timedelta() 
 
 def changeEnveronment():
+
     global instalPath   
     instalPath = instalPath_g
     global HDPlayerExe  
@@ -93,6 +127,31 @@ def changeEnveronment():
     confirm_x = confirm_x_g 
     global confirm_y 
     confirm_y = confirm_y_g
+
+    global duration_extract
+    duration_extract = duration_extract_g
+    global duration_install 
+    duration_install = duration_install_g  
+    global duration_Lunch
+    duration_Lunch   = duration_Lunch_g 
+    
+    global sleep_setup
+    sleep_setup = sleep_setup_g
+
+    global sleep_Terminate 
+    sleep_Terminate = sleep_Terminate_g
+
+    global sleep_StartProcess  
+    sleep_StartProcess  = sleep_StartProcess_g
+
+    global sleep_InstallApk 
+    sleep_InstallApk  = sleep_InstallApk_g
+
+    global sleep_LunchApk 
+    sleep_LunchApk = sleep_LunchApk_g
+
+    global sleep_confirm 
+    sleep_confirm = sleep_confirm_g
 
     
 
@@ -123,25 +182,14 @@ def Setup():
     ]
     try:
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        # Wait for the process to complete and capture output
-        #stdout, stderr = process.communicate()
-        # Print the output and error (if any)
-        #if stdout:
-        #    print("Output:", stdout)
-        #if stderr:
-        #    print("Error:", stderr)
-        # Check the return code
-        #if process.returncode != 0:
-        #    print(f"Command failed with return code: {process.returncode}")
-        #else:
-        #    print("Command executed successfully.")
+
     except Exception as e:
         print(f"Setup : {e}") 
         return False 
 
-    Click(lunch_x_position,lunch_y_position,18)
-    Click(lunch_x_position,lunch_y_position,2)
-    Click(lunch_x_position,lunch_y_position,120)
+    Click(lunch_x_position,lunch_y_position,duration_extract)
+    Click(lunch_x_position,lunch_y_position,duration_install)
+    Click(lunch_x_position,lunch_y_position,duration_Lunch)
     return True 
 
 def StartProcess(path):
@@ -329,29 +377,30 @@ def ProgressMapped(mappingValue=49):
     progressTotal =  v1 + v2 
     return int((progressTotal * 100) / mappingValue)
 
-def main(setup=True, changeToGit = False ):
+def main(setup=True, changeToGit = True ):
 
     if changeToGit :
         changeEnveronment() 
 
     if setup :
+        
         Setup() 
-        time.sleep(2)
+        time.sleep(sleep_setup)
 
         Terminate("BlueStacks Store")
-        time.sleep(2)
+        time.sleep(sleep_Terminate)
 
         StartProcess(HDPlayerExe) 
-        time.sleep(30)
+        time.sleep(sleep_StartProcess)
 
         InstallApk(apkPath)
-        time.sleep(10) 
+        time.sleep(sleep_InstallApk) 
 
         LunchApk(HDPlayerExe,"com.elnimr.shadowops")
-        time.sleep(10) 
+        time.sleep(sleep_LunchApk) 
        
         Click(confirm_x,confirm_y,2) ##close popup window controls .
-        time.sleep(1) 
+        time.sleep(sleep_confirm) 
     else:
         LunchApk(HDPlayerExe,"com.elnimr.shadowops")
         time.sleep(1) 
@@ -394,7 +443,7 @@ def loop():
 
 if __name__ == "__main__":
 
-    main(True,False)
+    main(True,True)
     loop()
 
     
