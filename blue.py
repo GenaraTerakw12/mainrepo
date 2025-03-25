@@ -79,10 +79,10 @@ sleep_StartProcess  = 30
 sleep_StartProcess_g  = 60
 
 sleep_InstallApk  = 10
-sleep_InstallApk_g  = 60
+sleep_InstallApk_g  = 80
 
 sleep_LunchApk = 10
-sleep_LunchApk_g = 60
+sleep_LunchApk_g = 40
 
 sleep_confirm = 2
 sleep_confirm_g = 4
