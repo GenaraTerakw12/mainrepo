@@ -60,13 +60,13 @@ toolbar_width_g       = 40
 
 
 duration_extract = 18 
-duration_extract_g = 60
+duration_extract_g = 50
 
 duration_install = 2 
 duration_install_g = 4
 
 duration_Lunch = 120 
-duration_Lunch_g = 400 
+duration_Lunch_g = 240 
 
 
 sleep_setup = 2
@@ -76,13 +76,13 @@ sleep_Terminate = 2
 sleep_Terminate_g = 4
 
 sleep_StartProcess  = 30
-sleep_StartProcess_g  = 120
+sleep_StartProcess_g  = 70
 
 sleep_InstallApk  = 10
-sleep_InstallApk_g  = 60
+sleep_InstallApk_g  = 40
 
 sleep_LunchApk = 10
-sleep_LunchApk_g = 30
+sleep_LunchApk_g = 16
 
 sleep_confirm = 2
 sleep_confirm_g = 4
@@ -412,6 +412,7 @@ def main(setup=True, changeToGit = True ):
         LunchApk(HDPlayerExe,"com.elnimr.shadowops")
         time.sleep(sleep_LunchApk) 
        
+        print("Confirmation check")
         Click(confirm_x,confirm_y,2) ##close popup window controls .
         time.sleep(sleep_confirm) 
     else:
