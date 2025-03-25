@@ -424,7 +424,7 @@ def loop():
     prev_frame = capture_window(window_title)
     time.sleep(1)  # Wait before capturing the next frame
 
-    
+    isPrinted = False 
     
     while True:
         
@@ -438,7 +438,8 @@ def loop():
 
         if movement_score > 100000:  # Threshold for movement detection
             
-            
+            print("ad started ..") 
+                
            # ad started 
             if(ProgressMapped() > 10 ) :
                 
