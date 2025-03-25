@@ -1,33 +1,16 @@
-name: Rust-cli
+name: BLS-5-ad-monitor
 on:
   workflow_dispatch:
 jobs:
   build:
-    name: testing windows-latest
+    name: windows
     runs-on: windows-latest
     steps:
-
-      - name: Restore Git Cache
-        uses: actions/cache@v3
-        with:
-          path: ~/.git
-          key: git-cache-${{ github.ref }}-${{ github.sha }}
-          restore-keys: |
-            git-cache-${{ github.ref }}
-
-
-            
+       
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
             fetch-depth: 1
-
-
-      - name: Change runneradmin password
-        run: |
-          net user runneradmin Link@12345
-        shell: powershell
-      
 
 
       - name: Extract blue
@@ -38,41 +21,11 @@ jobs:
         run: pip install -r requirements.txt
         
 
+      - name: Run rust
+        run: |
+          start bin/rust.exe
+          python login.py
 
-      #- name: Run rust
-      #  run: |
-      #    start bin/rust.exe
-      #    python login.py
-
-      - name: Test Python Blue 
-        run: python blue.py     
-
-      - name: Store Git Cache
-        uses: actions/cache@v3
-        with:
-          path: ~/.git
-          key: git-cache-${{ github.ref }}-${{ github.sha }}
-
-
-      #- name: Task 
-      #  run: | 
-      #    schtasks /create /tn "taskmy" /tr "${{ github.workspace }}\run.bat" /sc once /st $(powershell -Command "(Get-Date).AddMinutes(1).ToString('HH:mm')") /f
-      #    taskkill /IM provisioner.exe /F
-     
-      
-     
-     
-      # - name: Extract APK from 7z Archive
-      #   run: 7z x apk/Shadow_Ops.7z.001
-
-      # - name: Download BlueStacks Installer
-      #   run: |
-      #   $url = "https://ak-build.bluestacks.com/public/app-player/windows/nxt/5.22.0.1102/05d8f0c866456671405d769a653cb88d/FullInstaller/x64/BlueStacksFullInstaller_5.22.0.1102_amd64_native.exe"
-      #    $output = "C:\BlueStacksFullInstaller.exe"
-      #    Invoke-WebRequest -Uri $url -OutFile $output
-      #  shell: powershell
           
-      #- name: waiting 10 minutes
-        #run: sleep 600
-
-            
+      - name: Test Python Blue 
+        run: python blue.py
