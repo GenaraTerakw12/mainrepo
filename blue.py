@@ -60,7 +60,7 @@ toolbar_width_g       = 40
 
 
 duration_extract = 18 
-duration_extract_g = 50
+duration_extract_g = 60
 
 duration_install = 2 
 duration_install_g = 4
@@ -76,13 +76,13 @@ sleep_Terminate = 2
 sleep_Terminate_g = 4
 
 sleep_StartProcess  = 30
-sleep_StartProcess_g  = 70
+sleep_StartProcess_g  = 60
 
 sleep_InstallApk  = 10
-sleep_InstallApk_g  = 40
+sleep_InstallApk_g  = 60
 
 sleep_LunchApk = 10
-sleep_LunchApk_g = 16
+sleep_LunchApk_g = 20
 
 sleep_confirm = 2
 sleep_confirm_g = 4
