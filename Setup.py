@@ -172,17 +172,17 @@ def launch_apk(player_path, package_name):
 time.sleep(2)
 setup()
 
-time.sleep(6)
+time.sleep(10)
 terminate(STORE_TITLE)
 
 time.sleep(6)
 start_process(HD_PLAYER_EXE) 
 time.sleep(60)
 
-sleep_InstallApk  = 10
+install_apk(APK_PATH) 
 time.sleep(60)
 
-launch_apk()
+launch_apk(HD_PLAYER_EXE,"com.elnimr.shadowops")
 time.sleep(60)
 
 print("Confirmation check")
