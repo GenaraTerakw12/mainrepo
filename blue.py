@@ -66,7 +66,7 @@ duration_install = 2
 duration_install_g = 4
 
 duration_Lunch = 120 
-duration_Lunch_g = 240 
+duration_Lunch_g = 200 
 
 
 sleep_setup = 2
@@ -76,13 +76,13 @@ sleep_Terminate = 2
 sleep_Terminate_g = 4
 
 sleep_StartProcess  = 30
-sleep_StartProcess_g  = 60
+sleep_StartProcess_g  = 40
 
 sleep_InstallApk  = 10
-sleep_InstallApk_g  = 60
+sleep_InstallApk_g  = 20
 
 sleep_LunchApk = 10
-sleep_LunchApk_g = 20
+sleep_LunchApk_g = 10
 
 sleep_confirm = 2
 sleep_confirm_g = 4
