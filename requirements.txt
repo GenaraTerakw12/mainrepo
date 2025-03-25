@@ -5,3 +5,5 @@ pygetwindow
 pyautogui
 pywin32
 pywinauto
+pytesseract
+pynput

@@ -18,33 +18,85 @@ from pynput.mouse import Controller,Button
 mouse = Controller()
 from pywinauto import Application
 
-
+window_title = r"BlueStacks App Player"
+storeTitle   = r"BlueStacks Store"
 
 instalPath   = r"C:\Users\elnimr\Desktop\blue\blue.exe"
 HDPlayerExe  = r"C:\Program Files\BlueStacks_nxt\HD-Player.exe"
 HDAdb        = r"C:\Program Files\BlueStacks_nxt\Adb.exe.exe"
 apkPath      = r"C:\Users\elnimr\Documents\Unity\Shadow Ops\builds\Shadow_Ops.apk"
 
-window_title = r"BlueStacks App Player"
-storeTitle   = r"BlueStacks Store"
+instalPath_g   = r"D:\a\mainrepo\mainrepo\blue\blue.exe"
+HDPlayerExe_g  = r"C:\Program Files\BlueStacks_nxt\HD-Player.exe"
+HDAdb_g        = r"C:\Program Files\BlueStacks_nxt\Adb.exe.exe"
+apkPath_g      = r"D:\a\mainrepo\mainrepo\apk\Shadow_Ops.apk"
 
 close_x_position    = 1697 
 close_y_position    = 123 
-skip_x_position     = 191 
-skip_y_position     = 156 
+close_x_position_g    = 924 
+close_y_position_g    = 155 
+
+
+skip_x_position    = 191 
+skip_y_position    = 156 
+skip_x_position_g     = 54 
+skip_y_position_g     = 153 
+
 lunch_x_position    = 1317 
 lunch_y_position    = 735
+lunch_x_position_g    = 785 
+lunch_y_position_g    = 545
+
+confirm_x = 1551 ##close popup window controls .
+confirm_y = 409
+confirm_x_g = 822 
+confirm_y_g = 379
+
 
 progress_bar_height = 4 
 toolbar_width       = 40
+progress_bar_height_g = 4 
+toolbar_width_g       = 40
 
 
-startTime = datetime.now()
-motion    = False 
-isRunningAds = False  
-ad_duration = timedelta() 
+startTime       = datetime.now()
+motion          = False 
+isRunningAds    = False  
+ad_duration     = timedelta() 
 
+def changeEnveronment():
+    global instalPath   
+    instalPath = instalPath_g
+    global HDPlayerExe  
+    HDPlayerExe = HDPlayerExe_g
+    global HDAdb        
+    HDAdb = HDAdb_g
+    global apkPath      
+    apkPath = apkPath_g
 
+    global close_x_position   
+    close_x_position = close_x_position_g 
+    global close_y_position    
+    close_y_position= close_y_position_g 
+
+    global skip_x_position    
+    skip_x_position = skip_x_position_g 
+    global skip_y_position    
+    skip_y_position = skip_y_position_g 
+
+    global lunch_x_position       
+    lunch_x_position = lunch_x_position_g   
+    global lunch_y_position  
+    lunch_y_position = lunch_y_position_g   
+
+    global confirm_x 
+    confirm_x = confirm_x_g 
+    global confirm_y 
+    confirm_y = confirm_y_g
+
+    
+
+    
 
 def random_between(min_num, max_num):
     return random.randint(min_num, max_num)
@@ -277,7 +329,10 @@ def ProgressMapped(mappingValue=49):
     progressTotal =  v1 + v2 
     return int((progressTotal * 100) / mappingValue)
 
-def main(setup=True):
+def main(setup=True, changeToGit = False ):
+
+    if changeToGit :
+        changeEnveronment() 
 
     if setup :
         Setup() 
@@ -294,8 +349,8 @@ def main(setup=True):
 
         LunchApk(HDPlayerExe,"com.elnimr.shadowops")
         time.sleep(10) 
-
-        Click(1551,409,2) ##close popup window controls .
+       
+        Click(confirm_x,confirm_y,2) ##close popup window controls .
         time.sleep(1) 
     else:
         LunchApk(HDPlayerExe,"com.elnimr.shadowops")
@@ -339,7 +394,7 @@ def loop():
 
 if __name__ == "__main__":
 
-    main(False)
+    main(True,False)
     loop()
 
     
