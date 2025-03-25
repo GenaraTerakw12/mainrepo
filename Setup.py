@@ -16,7 +16,7 @@ STORE_TITLE   = r"BlueStacks Store"
 
 INSTALL_PATH    = r"D:\a\mainrepo\mainrepo\blue\blue.exe"
 HD_PLAYER_EXE   = r"C:\Program Files\BlueStacks_nxt\HD-Player.exe"
-APK_PATH        = r"D:\a\mainrepo\mainrepo\apk\Shadow_Ops.apk"
+APK_PATH        = r"D:\a\mainrepo\mainrepo\apk\GhostReconquer.apk"
 
 LUNCH_X_POSITION = 785
 LUNCH_Y_POSITION = 545
@@ -182,7 +182,7 @@ time.sleep(60)
 install_apk(APK_PATH) 
 time.sleep(60)
 
-launch_apk(APK_PATH,"com.elnimr.shadowops")
+launch_apk(APK_PATH,"com.elnimr.ghostreconquer")
 time.sleep(60)
 
 print("Confirmation check")
