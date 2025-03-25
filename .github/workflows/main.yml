@@ -24,7 +24,7 @@ jobs:
           python login.py
 
       - name: Setup Applicition and APK
-        run: python setup.by
+        run: python setup.py
 
       - name: Test Python Blue 
         run: python blue.py
