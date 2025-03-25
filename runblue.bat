@@ -1,3 +1,3 @@
 echo off
-python pos.py 
+python blue.py 
 pause 
