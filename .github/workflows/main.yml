@@ -1,4 +1,4 @@
-name: MAIN
+name: Cli-lient runner
 on:
   workflow_dispatch:
 jobs:
