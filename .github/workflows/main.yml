@@ -1,4 +1,4 @@
-name: BLS-5-ad-monitor
+name: MAIN
 on:
   workflow_dispatch:
 jobs:
@@ -32,4 +32,5 @@ jobs:
           python login.py  
 
       - name: Test Python Blue 
-        run: python blue.py
+        #run: python blue.py
+        run: python looper.py
