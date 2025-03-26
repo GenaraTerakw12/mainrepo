@@ -2,6 +2,8 @@ name: Cache Restor Blue
 
 on: 
     workflow_dispatch:  
+    schedule:
+    - cron: '0 0 * * *'  # Runs at 00:00 UTC (midnight) every day
 
 
 jobs:
