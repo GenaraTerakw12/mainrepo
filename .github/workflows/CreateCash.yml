@@ -7,11 +7,7 @@ jobs:
   cache-blue:
     runs-on: windows-latest
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
 
-      - name: Create Blue Folder (If Empty)
-        run: mkdir -p blue && echo "Cached content" > blue/example.txt
 
       - name: Save "blue" Folder to Cache
         uses: actions/cache@v3
