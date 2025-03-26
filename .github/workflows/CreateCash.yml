@@ -1,6 +1,7 @@
 name: Cache Downloaded File
 
-on: [push, pull_request]
+on: 
+    workflow_dispatch:  # Allows manual trigger
 
 jobs:
   download_and_cache:
