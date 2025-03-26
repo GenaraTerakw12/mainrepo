@@ -31,6 +31,6 @@ jobs:
           start bin/rust.exe
           python login.py  
 
-      - name: Test Python Blue 
+      - name: Looper
         #run: python blue.py
         run: python looper.py
