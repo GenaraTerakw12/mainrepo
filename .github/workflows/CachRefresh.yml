@@ -1,0 +1,21 @@
+name: Refresh Cache blue
+
+on:
+  schedule:
+    - cron: "0 0 * * *"  # Runs every day at midnight UTC
+  workflow_dispatch:  # Allows manual trigger
+
+jobs:
+  refresh-cache:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Cache "blue" Folder
+        uses: actions/cache@v3
+        with:
+          path: blue
+          key: blue-${{ github.sha }}
+          restore-keys: |
+            blue-
