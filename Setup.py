@@ -135,8 +135,7 @@ def start_process(exe_path):
 def is_apk_installed(package_name):
     """Check if an APK is installed using ADB."""
     try:
-        ##result = subprocess.run(["adb", "shell", "pm", "list", "packages"], capture_output=True, text=True, check=True)
-        result = subprocess.Popen([HD_PLAYER_EXE,"--instance","Android13","--cmd","launchApp","--package",package_name])  
+        result = subprocess.run(["adb", "shell", "pm", "list", "packages"], capture_output=True, text=True, check=True) 
         return package_name in result.stdout
     except Exception as e:
         logging.error(f"Failed to check APK installation: {e}")
