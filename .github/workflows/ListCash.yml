@@ -20,3 +20,8 @@ jobs:
         if: steps.cache-download.outputs.cache-hit == 'true'
         run: Get-ChildItem -Path downloads
         shell: pwsh
+      
+      - name: listing 
+        run: |
+          cd downloads
+          dir
