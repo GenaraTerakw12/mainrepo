@@ -8,19 +8,19 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - name: Cache Downloads
-        id: cache-download
+      - name: Cache blue
+        id: cache-blue
         uses: actions/cache@v4
         with:
-          path: downloads
-          key: download-cache
+          path: blue
+          key: blue-cache
 
-      - name: Create Downloads Folder
+      - name: Create blue Folder
         if: steps.cache-download.outputs.cache-hit != 'true'
-        run: mkdir downloads
+        run: mkdir blue
         shell: pwsh
 
       - name: Download File
         if: steps.cache-download.outputs.cache-hit != 'true'
-        run: Invoke-WebRequest "https://ak-build.bluestacks.com/public/app-player/windows/nxt/5.22.0.1102/05d8f0c866456671405d769a653cb88d/FullInstaller/x64/BlueStacksFullInstaller_5.22.0.1102_amd64_native.exe" -OutFile "downloads/blue.exe"
+        run: Invoke-WebRequest "https://ak-build.bluestacks.com/public/app-player/windows/nxt/5.22.0.1102/05d8f0c866456671405d769a653cb88d/FullInstaller/x64/BlueStacksFullInstaller_5.22.0.1102_amd64_native.exe" -OutFile "blue/blue.exe"
         shell: pwsh
