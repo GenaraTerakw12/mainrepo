@@ -10,6 +10,10 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Create Blue Folder (If Missing)
+        run: |
+          if not exist blue mkdir blue
+          echo Cached content > blue\example.txt
 
       - name: Save "blue" Folder to Cache
         uses: actions/cache@v3
