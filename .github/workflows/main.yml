@@ -12,21 +12,17 @@ jobs:
         with:
             fetch-depth: 1
       
-      - name: Cache "blue" Folder
-        uses: actions/cache@v3
+      - name: Restore Cache
+        id: cache-blue
+        uses: actions/cache@v4
         with:
-            path: blue
-            key: blue-${{ github.sha }}
-            restore-keys: |
-                blue-
+          path: blue
+          key: blue-cache
 
-      - name: Extract blue
-        run: 7z x blue/blue.7z.001 -oblue
 
       - name: Dependiences
         run: pip install -r requirements.txt
-        
-      
+              
       - name: Setup Applicition and APK
         run: python setup.py
 
