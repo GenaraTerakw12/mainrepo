@@ -1,4 +1,4 @@
-name: Restore and List Cached Downloads
+name: Restore and List Blue Cached
 
 on: 
     workflow_dispatch:  
