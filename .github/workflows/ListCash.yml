@@ -10,18 +10,18 @@ jobs:
 
     steps:
       - name: Restore Cache
-        id: cache-download
+        id: cache-blue
         uses: actions/cache@v4
         with:
-          path: downloads
-          key: download-cache
+          path: blue
+          key: blue-cache
 
-      - name: List Cached Files
+      - name: List blue Files
         if: steps.cache-download.outputs.cache-hit == 'true'
-        run: Get-ChildItem -Path downloads
+        run: Get-ChildItem -Path blue
         shell: pwsh
       
       - name: listing 
         run: |
-          cd downloads
+          cd blue
           dir
