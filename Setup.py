@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 # Constants
 WINDOW_TITLE = "BlueStacks App Player"
 STORE_TITLE   = r"BlueStacks Store"
-
+PACK_NAME  = r"com.elnimr.ghostreconquer"
 
 INSTALL_PATH    = r"D:\a\mainrepo\mainrepo\blue\blue.exe"
 HD_PLAYER_EXE   = r"C:\Program Files\BlueStacks_nxt\HD-Player.exe"
@@ -135,7 +135,8 @@ def start_process(exe_path):
 def is_apk_installed(package_name):
     """Check if an APK is installed using ADB."""
     try:
-        result = subprocess.run(["adb", "shell", "pm", "list", "packages"], capture_output=True, text=True, check=True)
+        ##result = subprocess.run(["adb", "shell", "pm", "list", "packages"], capture_output=True, text=True, check=True)
+        result = subprocess.Popen([HD_PLAYER_EXE,"--instance","Android13","--cmd","launchApp","--package",package_name])  
         return package_name in result.stdout
     except Exception as e:
         logging.error(f"Failed to check APK installation: {e}")
@@ -182,7 +183,7 @@ time.sleep(60)
 install_apk(APK_PATH) 
 time.sleep(60)
 
-launch_apk(APK_PATH,"com.elnimr.ghostreconquer")
+launch_apk(APK_PATH,PACK_NAME)
 time.sleep(60)
 
 print("Confirmation check")
