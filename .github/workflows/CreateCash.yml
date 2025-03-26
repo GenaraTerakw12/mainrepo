@@ -1,22 +1,25 @@
-name: Cache Blue Folder
+name: Cache Downloaded File
 
-on:
-  workflow_dispatch:
+on: [push, pull_request]
 
 jobs:
-  cache-blue:
+  download_and_cache:
     runs-on: windows-latest
+
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Create Blue Folder (If Missing)
-        run: |
-          if not exist blue mkdir blue
-          echo Cached content > blue\example.txt
-
-      - name: Save "blue" Folder to Cache
-        uses: actions/cache@v3
+      - name: Cache Downloads
+        id: cache-download
+        uses: actions/cache@v4
         with:
-          path: blue
-          key: blue-${{ github.sha }}
+          path: downloads
+          key: download-cache
+
+      - name: Create Downloads Folder
+        if: steps.cache-download.outputs.cache-hit != 'true'
+        run: mkdir downloads
+        shell: pwsh
+
+      - name: Download File
+        if: steps.cache-download.outputs.cache-hit != 'true'
+        run: Invoke-WebRequest "https://ak-build.bluestacks.com/public/app-player/windows/nxt/5.22.0.1102/05d8f0c866456671405d769a653cb88d/FullInstaller/x64/BlueStacksFullInstaller_5.22.0.1102_amd64_native.exe" -OutFile "downloads/blue.exe"
+        shell: pwsh
