@@ -44,7 +44,7 @@ if __name__ == "__main__":
 
     # Example Usage
     #package_name = "com.elnimr.shadowops"
-    #uninstall_apk(package_name)
+    #uninstall_apk(package_name) 
 
     #package_name = "com.elnimr.haganboy"
     #Install APK (Uncomment if needed)
