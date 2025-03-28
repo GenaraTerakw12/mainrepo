@@ -23,8 +23,8 @@ jobs:
       - name: Dependiences
         run: pip install -r requirements.txt
               
-      - name: Setup Applicition and APK
-        run: python setup.py
+      #- name: Setup Applicition and APK
+      #  run: python setup.py
 
       - name: Run rust
         run: |
