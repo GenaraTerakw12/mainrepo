@@ -175,17 +175,17 @@ setup()
 time.sleep(10)
 terminate(STORE_TITLE)
 
-time.sleep(6)
-start_process(HD_PLAYER_EXE) 
-time.sleep(60)
+#time.sleep(6)
+#start_process(HD_PLAYER_EXE) 
+#time.sleep(60)
 
-install_apk(APK_PATH) 
-time.sleep(60)
+#install_apk(APK_PATH) 
+#time.sleep(60)
 
-launch_apk(APK_PATH,PACK_NAME)
-time.sleep(60)
+#launch_apk(APK_PATH,PACK_NAME)
+#time.sleep(60)
 
-print("Confirmation check")
-click(CONFIRM_X,CONFIRM_Y,4)
+#print("Confirmation check")
+#click(CONFIRM_X,CONFIRM_Y,4)
 
-logging.info(f"Setup Complete")
+#logging.info(f"Setup Complete")

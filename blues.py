@@ -1,5 +1,6 @@
-import adb_utils 
-from adb_utils import start_bluestacks, is_app_installed, install_apk, is_app_running, launch_app, is_window_open , move_and_focus_window
+from adb_utils import start_bluestacks, is_app_installed, install_apk
+from adb_utils import is_app_running , launch_app, is_window_open , move_and_focus_window , change_resolution
+
 import time 
 
 # BlueStacks Config

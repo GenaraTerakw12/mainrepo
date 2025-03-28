@@ -207,3 +207,23 @@ def is_app_running(package_name):
         print(f"[-] Error checking if app is running: {e}")
         return False
     
+# -----------------------------------------------
+# ✅ Screen Resolution 
+# -----------------------------------------------
+
+def change_resolution(width, height, dpi=240):
+    """Change BlueStacks screen resolution using ADB."""
+    device = connect_adb()
+    if not device:
+        print("[-] ADB connection failed.")
+        return False
+
+    try:
+        print(f"[+] Setting resolution to {width}x{height} and DPI to {dpi}...")
+        device.shell(f"wm size {width}x{height}")  # Change screen size
+        device.shell(f"wm density {dpi}")  # Change DPI
+        print("[+] Resolution changed successfully!")
+        return True
+    except Exception as e:
+        print(f"[-] Error changing resolution: {e}")
+        return False
